@@ -1,0 +1,68 @@
+# Node modules for both backend and frontend
+backend/node_modules/
+frontend/node_modules/
+node_modules/
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+.log
+
+# Build artifacts
+backend/apps/*/dist/
+backend/apps/*/.nestjs/
+frontend/build/
+dist/
+build/
+
+# Environment variables
+backend/.env
+frontend/.env
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# TypeScript
+*.tsbuildinfo
+
+# Debugging
+*.swp
+*.swo
+*.swn
+*.idea/
+
+# VSCode settings
+.vscode/
+.vscode/*
+
+# OS Files
+.DS_Store
+Thumbs.db
+
+# Docker
+docker-compose.override.yml
+backend.Dockerfile
+frontend.Dockerfile
+docker-volumes/
+pg_data/
+postgres-data/
+
+# Jest & Coverage
+coverage/
+backend/coverage/
+frontend/coverage/
+.jest/
+.nyc_output/
+
+# Misc
+backend/tmp/
+frontend/tmp/
+backend/.cache/
+frontend/.cache/
