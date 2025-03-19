@@ -1,0 +1,10 @@
+{
+  "name": "backend",
+  "private": true,
+  "workspaces": [
+    "apps/*"
+  ],
+  "devDependencies": {
+    "@nestjs/cli": "^10.0.0"
+  }
+}
