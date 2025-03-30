@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 
-// Dummy data interface and sample data for the table
+// Update dummy data interface to include transitTime and type
 interface Rate {
   id: number;
   agentName: string;
@@ -13,6 +13,8 @@ interface Rate {
   exCost: number;
   total: number;
   createdDate: string;
+  transitTime: string;
+  type: string;
 }
 
 const dummyRates: Rate[] = [
@@ -27,6 +29,8 @@ const dummyRates: Rate[] = [
     exCost: 50,
     total: 1250,
     createdDate: "2025-03-30",
+    transitTime: "7 days",
+    type: "Express",
   },
   {
     id: 2,
@@ -39,6 +43,8 @@ const dummyRates: Rate[] = [
     exCost: 70,
     total: 1870,
     createdDate: "2025-03-28",
+    transitTime: "10 days",
+    type: "Standard",
   },
   // Add more dummy entries as needed
 ];
@@ -132,6 +138,8 @@ const RatesDashboard: React.FC = () => {
               <th style={{ border: "1px solid #ccc", padding: "8px" }}>Other Cost</th>
               <th style={{ border: "1px solid #ccc", padding: "8px" }}>Ex Cost</th>
               <th style={{ border: "1px solid #ccc", padding: "8px" }}>Total</th>
+              <th style={{ border: "1px solid #ccc", padding: "8px" }}>Transit Time</th>
+              <th style={{ border: "1px solid #ccc", padding: "8px" }}>Type</th>
               <th style={{ border: "1px solid #ccc", padding: "8px" }}>Created Date</th>
             </tr>
           </thead>
@@ -146,6 +154,8 @@ const RatesDashboard: React.FC = () => {
                 <td style={{ border: "1px solid #ccc", padding: "8px" }}>{rate.otherCost}</td>
                 <td style={{ border: "1px solid #ccc", padding: "8px" }}>{rate.exCost}</td>
                 <td style={{ border: "1px solid #ccc", padding: "8px" }}>{rate.total}</td>
+                <td style={{ border: "1px solid #ccc", padding: "8px" }}>{rate.transitTime}</td>
+                <td style={{ border: "1px solid #ccc", padding: "8px" }}>{rate.type}</td>
                 <td style={{ border: "1px solid #ccc", padding: "8px" }}>{rate.createdDate}</td>
               </tr>
             ))}
