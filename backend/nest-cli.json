@@ -54,7 +54,7 @@
       "type": "application",
       "root": "apps/auth",
       "entryFile": "main",
-      "sourceRoot": "apps/tauth/src",
+      "sourceRoot": "apps/auth/src",
       "compilerOptions": {
         "deleteOutDir": true,
         "tsConfigPath": "apps/auth/tsconfig.app.json",
