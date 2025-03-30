@@ -16,7 +16,7 @@ function App() {
         <aside className="sidebar">
           <div className="logo">
             {/* Replace the src with your logo path or use text */}
-            <img src="logo.png" alt="Logo" />
+            <img src="logo.svg" alt="Logo" />
           </div>
           <nav className="menu">
             <ul>
