@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
+import "./Dashboard.css";
 
-// Define an interface for an inquiry record
 interface Inquiry {
   id: number;
   type: "Export" | "Import";
@@ -17,7 +17,6 @@ interface Inquiry {
   addedBy: string;
 }
 
-// Dummy data for demonstration purposes
 const dummyInquiries: Inquiry[] = [
   {
     id: 1,
@@ -47,35 +46,42 @@ const dummyInquiries: Inquiry[] = [
     status: "Closed",
     addedBy: "User 2",
   },
-  // Add additional dummy inquiries as needed
 ];
 
 const InquiriesDashboard: React.FC = () => {
-  // Filter state variables for Added By and Status
+  // Filter states
   const [addedByFilter, setAddedByFilter] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
 
-  // Placeholder filter handler
   const handleFilterChange = () => {
-    console.log("Filters applied:", { addedBy: addedByFilter, status: statusFilter });
-    // Implement your filtering logic here
+    // Implement filtering or API calls here
+    console.log("Filters applied:", {
+      addedBy: addedByFilter,
+      status: statusFilter,
+    });
   };
 
-  return (
-    <div className="inquiries-dashboard" style={{ padding: "20px" }}>
-      <h1>Inquiries Dashboard</h1>
+  const filteredInquiries = dummyInquiries.filter(
+    (inquiry) =>
+      (addedByFilter
+        ? inquiry.addedBy.toLowerCase().includes(addedByFilter.toLowerCase())
+        : true) && (statusFilter ? inquiry.status === statusFilter : true)
+  );
 
-      {/* Add Inquiry Button */}
-      <div style={{ marginBottom: "20px" }}>
+  return (
+    <div className="dashboard-page">
+      {/* Page Header */}
+      <div className="page-header">
+        <h2>Inquiries Dashboard</h2>
         <Link to="/inquiries/add">
-          <button>Add Inquiry</button>
+          <button className="primary-btn">Add Inquiry</button>
         </Link>
       </div>
 
       {/* Filters Section */}
-      <div className="filters" style={{ marginBottom: "20px" }}>
-        <div style={{ marginBottom: "10px" }}>
-          <label style={{ marginRight: "10px" }}>Added By:</label>
+      <div className="search-filter-bar">
+        <div className="filter-group">
+          <label>Added By:</label>
           <input
             type="text"
             value={addedByFilter}
@@ -83,70 +89,54 @@ const InquiriesDashboard: React.FC = () => {
             placeholder="Enter name"
           />
         </div>
-        <div style={{ marginBottom: "10px" }}>
-          <label style={{ marginRight: "10px" }}>Status:</label>
+        <div className="filter-group">
+          <label>Status:</label>
           <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}>
             <option value="">All</option>
             <option value="Open">Open</option>
             <option value="Closed">Closed</option>
-            {/* Add more status options as needed */}
           </select>
         </div>
-        <button onClick={handleFilterChange}>Apply Filters</button>
+        <button className="apply-filters-btn" onClick={handleFilterChange}>
+          Apply Filters
+        </button>
       </div>
 
       {/* Table Section */}
-      <div className="table-container">
-        <table style={{ width: "100%", borderCollapse: "collapse" }}>
+      <div className="table-card">
+        <h3>Inquiries</h3>
+        <table className="data-table">
           <thead>
             <tr>
-              <th style={{ border: "1px solid #ccc", padding: "8px" }}>Type</th>
-              <th style={{ border: "1px solid #ccc", padding: "8px" }}>Method</th>
-              <th style={{ border: "1px solid #ccc", padding: "8px" }}>Port of Loading</th>
-              <th style={{ border: "1px solid #ccc", padding: "8px" }}>Port of Discharge</th>
-              <th style={{ border: "1px solid #ccc", padding: "8px" }}>Created Date</th>
-              <th style={{ border: "1px solid #ccc", padding: "8px" }}>Rate Offered</th>
-              <th style={{ border: "1px solid #ccc", padding: "8px" }}>Client Name</th>
-              <th style={{ border: "1px solid #ccc", padding: "8px" }}>Client Contact</th>
-              <th style={{ border: "1px solid #ccc", padding: "8px" }}>Feedback</th>
-              <th style={{ border: "1px solid #ccc", padding: "8px" }}>Status</th>
-              <th style={{ border: "1px solid #ccc", padding: "8px" }}>Added By</th>
+              <th>Type</th>
+              <th>Method</th>
+              <th>Port of Loading</th>
+              <th>Port of Discharge</th>
+              <th>Created Date</th>
+              <th>Rate Offered</th>
+              <th>Client Name</th>
+              <th>Client Contact</th>
+              <th>Feedback</th>
+              <th>Status</th>
+              <th>Added By</th>
             </tr>
           </thead>
           <tbody>
-            {dummyInquiries
-              // Optionally filter the dummy data (for demonstration)
-              .filter(
-                (inquiry) =>
-                  (addedByFilter
-                    ? inquiry.addedBy.toLowerCase().includes(addedByFilter.toLowerCase())
-                    : true) && (statusFilter ? inquiry.status === statusFilter : true)
-              )
-              .map((inquiry) => (
-                <tr key={inquiry.id}>
-                  <td style={{ border: "1px solid #ccc", padding: "8px" }}>{inquiry.type}</td>
-                  <td style={{ border: "1px solid #ccc", padding: "8px" }}>{inquiry.method}</td>
-                  <td style={{ border: "1px solid #ccc", padding: "8px" }}>
-                    {inquiry.portOfLoading}
-                  </td>
-                  <td style={{ border: "1px solid #ccc", padding: "8px" }}>
-                    {inquiry.portOfDischarge}
-                  </td>
-                  <td style={{ border: "1px solid #ccc", padding: "8px" }}>
-                    {inquiry.createdDate}
-                  </td>
-                  <td style={{ border: "1px solid #ccc", padding: "8px" }}>
-                    {inquiry.rateOffered}
-                  </td>
-                  <td style={{ border: "1px solid #ccc", padding: "8px" }}>{inquiry.clientName}</td>
-                  <td style={{ border: "1px solid #ccc", padding: "8px" }}>
-                    {inquiry.clientContact}
-                  </td>
-                  <td style={{ border: "1px solid #ccc", padding: "8px" }}>{inquiry.feedback}</td>
-                  <td style={{ border: "1px solid #ccc", padding: "8px" }}>{inquiry.status}</td>
-                  <td style={{ border: "1px solid #ccc", padding: "8px" }}>{inquiry.addedBy}</td>
-                </tr>
-              ))}
+            {filteredInquiries.map((inquiry) => (
+              <tr key={inquiry.id}>
+                <td>{inquiry.type}</td>
+                <td>{inquiry.method}</td>
+                <td>{inquiry.portOfLoading}</td>
+                <td>{inquiry.portOfDischarge}</td>
+                <td>{inquiry.createdDate}</td>
+                <td>{inquiry.rateOffered}</td>
+                <td>{inquiry.clientName}</td>
+                <td>{inquiry.clientContact}</td>
+                <td>{inquiry.feedback}</td>
+                <td>{inquiry.status}</td>
+                <td>{inquiry.addedBy}</td>
+              </tr>
+            ))}
           </tbody>
         </table>
       </div>

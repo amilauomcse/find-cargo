@@ -1,10 +1,11 @@
+// AddRates.tsx
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import "./FormStyles.css";
 
 const AddRates: React.FC = () => {
   const navigate = useNavigate();
 
-  // State variables for form fields
   const [agentName, setAgentName] = useState("");
   const [etd, setEtd] = useState("");
   const [carrier, setCarrier] = useState("");
@@ -17,10 +18,8 @@ const AddRates: React.FC = () => {
   const [rateType, setRateType] = useState("");
   const [createdDate, setCreatedDate] = useState("");
 
-  // Handle form submission
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-
     const newRate = {
       agentName,
       etd,
@@ -34,20 +33,16 @@ const AddRates: React.FC = () => {
       rateType,
       createdDate,
     };
-
-    // Replace this with your API call or desired processing logic
     console.log("New Rate:", newRate);
-
-    // Navigate back to the rates dashboard after submission
     navigate("/rates");
   };
 
   return (
-    <div style={{ padding: "20px" }}>
-      <h1>Add Rates</h1>
-      <form onSubmit={handleSubmit} style={{ maxWidth: "600px" }}>
-        <div style={{ marginBottom: "10px" }}>
-          <label>Agent Name: </label>
+    <div className="form-container">
+      <h1 className="form-header">Add Rates</h1>
+      <form onSubmit={handleSubmit}>
+        <div className="form-group">
+          <label>Agent Name:</label>
           <input
             type="text"
             value={agentName}
@@ -55,12 +50,12 @@ const AddRates: React.FC = () => {
             placeholder="Enter agent name"
           />
         </div>
-        <div style={{ marginBottom: "10px" }}>
-          <label>ETD: </label>
+        <div className="form-group">
+          <label>ETD:</label>
           <input type="date" value={etd} onChange={(e) => setEtd(e.target.value)} />
         </div>
-        <div style={{ marginBottom: "10px" }}>
-          <label>Carrier: </label>
+        <div className="form-group">
+          <label>Carrier:</label>
           <input
             type="text"
             value={carrier}
@@ -68,16 +63,16 @@ const AddRates: React.FC = () => {
             placeholder="Enter carrier"
           />
         </div>
-        <div style={{ marginBottom: "10px" }}>
-          <label>Container Type: </label>
+        <div className="form-group">
+          <label>Container Type:</label>
           <select value={containerType} onChange={(e) => setContainerType(e.target.value)}>
             <option value="">Select Container Type</option>
             <option value="20ft">20ft</option>
             <option value="40ft">40ft</option>
           </select>
         </div>
-        <div style={{ marginBottom: "10px" }}>
-          <label>Sea Freight: </label>
+        <div className="form-group">
+          <label>Sea Freight:</label>
           <input
             type="number"
             value={seaFreight}
@@ -85,8 +80,8 @@ const AddRates: React.FC = () => {
             placeholder="Enter sea freight cost"
           />
         </div>
-        <div style={{ marginBottom: "10px" }}>
-          <label>Other Cost: </label>
+        <div className="form-group">
+          <label>Other Cost:</label>
           <input
             type="number"
             value={otherCost}
@@ -94,8 +89,8 @@ const AddRates: React.FC = () => {
             placeholder="Enter other cost"
           />
         </div>
-        <div style={{ marginBottom: "10px" }}>
-          <label>Ex Cost: </label>
+        <div className="form-group">
+          <label>Ex Cost:</label>
           <input
             type="number"
             value={exCost}
@@ -103,8 +98,8 @@ const AddRates: React.FC = () => {
             placeholder="Enter ex cost"
           />
         </div>
-        <div style={{ marginBottom: "10px" }}>
-          <label>Total: </label>
+        <div className="form-group">
+          <label>Total:</label>
           <input
             type="number"
             value={total}
@@ -112,8 +107,8 @@ const AddRates: React.FC = () => {
             placeholder="Enter total"
           />
         </div>
-        <div style={{ marginBottom: "10px" }}>
-          <label>Transit Time: </label>
+        <div className="form-group">
+          <label>Transit Time:</label>
           <input
             type="text"
             value={transitTime}
@@ -121,19 +116,21 @@ const AddRates: React.FC = () => {
             placeholder="e.g., 7 days"
           />
         </div>
-        <div style={{ marginBottom: "10px" }}>
-          <label>Type: </label>
+        <div className="form-group">
+          <label>Type:</label>
           <select value={rateType} onChange={(e) => setRateType(e.target.value)}>
             <option value="">Select Rate Type</option>
             <option value="Express">Express</option>
             <option value="Standard">Standard</option>
           </select>
         </div>
-        <div style={{ marginBottom: "10px" }}>
-          <label>Created Date: </label>
+        <div className="form-group">
+          <label>Created Date:</label>
           <input type="date" value={createdDate} onChange={(e) => setCreatedDate(e.target.value)} />
         </div>
-        <button type="submit">Submit Rate</button>
+        <button className="submit-button" type="submit">
+          Submit Rate
+        </button>
       </form>
     </div>
   );

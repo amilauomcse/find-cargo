@@ -1,7 +1,8 @@
+// RatesDashboard.tsx (modernized)
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
+import "./Dashboard.css"; // We'll define modern styles in this CSS file
 
-// Update dummy data interface to include transitTime and type
 interface Rate {
   id: number;
   agentName: string;
@@ -46,20 +47,16 @@ const dummyRates: Rate[] = [
     transitTime: "10 days",
     type: "Standard",
   },
-  // Add more dummy entries as needed
 ];
 
 const RatesDashboard: React.FC = () => {
-  // States for filter values
   const [containerType, setContainerType] = useState("");
   const [term, setTerm] = useState("");
   const [loadingPort, setLoadingPort] = useState("");
   const [dischargePort, setDischargePort] = useState("");
   const [cargoReadyDate, setCargoReadyDate] = useState("");
 
-  // Placeholder for filter logic
   const handleFilterChange = () => {
-    // Implement filter logic based on the current state values
     console.log("Filters applied:", {
       containerType,
       term,
@@ -70,93 +67,95 @@ const RatesDashboard: React.FC = () => {
   };
 
   return (
-    <div className="rates-dashboard" style={{ padding: "20px" }}>
-      <h1>Rates Dashboard</h1>
-
-      {/* Add Rates Button */}
-      <div style={{ marginBottom: "20px" }}>
+    <div className="dashboard-page">
+      {/* Page Header */}
+      <div className="page-header">
+        <h2>Rates Dashboard</h2>
         <Link to="/rates/add">
-          <button>Add Rates</button>
+          <button className="primary-btn">Add Rates</button>
         </Link>
       </div>
 
-      {/* Filters Section */}
-      <div className="filters" style={{ marginBottom: "20px" }}>
-        <div style={{ marginBottom: "10px" }}>
-          <label style={{ marginRight: "10px" }}>Container Type:</label>
+      {/* Filters */}
+      <div className="search-filter-bar">
+        <div className="filter-group">
+          <label>Container Type:</label>
           <select value={containerType} onChange={(e) => setContainerType(e.target.value)}>
             <option value="">Select Container Type</option>
             <option value="20ft">20ft</option>
             <option value="40ft">40ft</option>
           </select>
         </div>
-        <div style={{ marginBottom: "10px" }}>
-          <label style={{ marginRight: "10px" }}>Term:</label>
+        <div className="filter-group">
+          <label>Term:</label>
           <select value={term} onChange={(e) => setTerm(e.target.value)}>
             <option value="">Select Term</option>
             <option value="short">Short Term</option>
             <option value="long">Long Term</option>
           </select>
         </div>
-        <div style={{ marginBottom: "10px" }}>
-          <label style={{ marginRight: "10px" }}>Loading Port:</label>
+        <div className="filter-group">
+          <label>Loading Port:</label>
           <select value={loadingPort} onChange={(e) => setLoadingPort(e.target.value)}>
             <option value="">Select Loading Port</option>
             <option value="Port A">Port A</option>
             <option value="Port B">Port B</option>
           </select>
         </div>
-        <div style={{ marginBottom: "10px" }}>
-          <label style={{ marginRight: "10px" }}>Discharge Port:</label>
+        <div className="filter-group">
+          <label>Discharge Port:</label>
           <select value={dischargePort} onChange={(e) => setDischargePort(e.target.value)}>
             <option value="">Select Discharge Port</option>
             <option value="Port C">Port C</option>
             <option value="Port D">Port D</option>
           </select>
         </div>
-        <div style={{ marginBottom: "10px" }}>
-          <label style={{ marginRight: "10px" }}>Cargo Ready Date:</label>
+        <div className="filter-group">
+          <label>Cargo Ready Date:</label>
           <input
             type="date"
             value={cargoReadyDate}
             onChange={(e) => setCargoReadyDate(e.target.value)}
           />
         </div>
-        <button onClick={handleFilterChange}>Apply Filters</button>
+        <button className="apply-filters-btn" onClick={handleFilterChange}>
+          Apply Filters
+        </button>
       </div>
 
       {/* Table Section */}
-      <div className="table-container">
-        <table style={{ width: "100%", borderCollapse: "collapse" }}>
+      <div className="table-card">
+        <h3>Rates</h3>
+        <table className="data-table">
           <thead>
             <tr>
-              <th style={{ border: "1px solid #ccc", padding: "8px" }}>Agent Name</th>
-              <th style={{ border: "1px solid #ccc", padding: "8px" }}>ETD</th>
-              <th style={{ border: "1px solid #ccc", padding: "8px" }}>Carrier</th>
-              <th style={{ border: "1px solid #ccc", padding: "8px" }}>Container Type</th>
-              <th style={{ border: "1px solid #ccc", padding: "8px" }}>Sea Freight</th>
-              <th style={{ border: "1px solid #ccc", padding: "8px" }}>Other Cost</th>
-              <th style={{ border: "1px solid #ccc", padding: "8px" }}>Ex Cost</th>
-              <th style={{ border: "1px solid #ccc", padding: "8px" }}>Total</th>
-              <th style={{ border: "1px solid #ccc", padding: "8px" }}>Transit Time</th>
-              <th style={{ border: "1px solid #ccc", padding: "8px" }}>Type</th>
-              <th style={{ border: "1px solid #ccc", padding: "8px" }}>Created Date</th>
+              <th>Agent Name</th>
+              <th>ETD</th>
+              <th>Carrier</th>
+              <th>Container Type</th>
+              <th>Sea Freight</th>
+              <th>Other Cost</th>
+              <th>Ex Cost</th>
+              <th>Total</th>
+              <th>Transit Time</th>
+              <th>Type</th>
+              <th>Created Date</th>
             </tr>
           </thead>
           <tbody>
             {dummyRates.map((rate) => (
               <tr key={rate.id}>
-                <td style={{ border: "1px solid #ccc", padding: "8px" }}>{rate.agentName}</td>
-                <td style={{ border: "1px solid #ccc", padding: "8px" }}>{rate.etd}</td>
-                <td style={{ border: "1px solid #ccc", padding: "8px" }}>{rate.carrier}</td>
-                <td style={{ border: "1px solid #ccc", padding: "8px" }}>{rate.containerType}</td>
-                <td style={{ border: "1px solid #ccc", padding: "8px" }}>{rate.seaFreight}</td>
-                <td style={{ border: "1px solid #ccc", padding: "8px" }}>{rate.otherCost}</td>
-                <td style={{ border: "1px solid #ccc", padding: "8px" }}>{rate.exCost}</td>
-                <td style={{ border: "1px solid #ccc", padding: "8px" }}>{rate.total}</td>
-                <td style={{ border: "1px solid #ccc", padding: "8px" }}>{rate.transitTime}</td>
-                <td style={{ border: "1px solid #ccc", padding: "8px" }}>{rate.type}</td>
-                <td style={{ border: "1px solid #ccc", padding: "8px" }}>{rate.createdDate}</td>
+                <td>{rate.agentName}</td>
+                <td>{rate.etd}</td>
+                <td>{rate.carrier}</td>
+                <td>{rate.containerType}</td>
+                <td>{rate.seaFreight}</td>
+                <td>{rate.otherCost}</td>
+                <td>{rate.exCost}</td>
+                <td>{rate.total}</td>
+                <td>{rate.transitTime}</td>
+                <td>{rate.type}</td>
+                <td>{rate.createdDate}</td>
               </tr>
             ))}
           </tbody>

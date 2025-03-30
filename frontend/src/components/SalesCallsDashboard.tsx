@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
+import "./Dashboard.css";
 
-// Define an interface for a sales call record
 interface SalesCall {
   id: number;
   customerName: string;
@@ -12,7 +12,6 @@ interface SalesCall {
   nextFollowupDate: string;
 }
 
-// Dummy data for demonstration purposes
 const dummySalesCalls: SalesCall[] = [
   {
     id: 1,
@@ -32,37 +31,44 @@ const dummySalesCalls: SalesCall[] = [
     feedback: "Needs follow-up",
     nextFollowupDate: "2025-04-10",
   },
-  // Add more dummy records as needed
 ];
 
 const SalesCallsDashboard: React.FC = () => {
-  // Filter state variables for Customer Name and Contacted Employee
   const [customerFilter, setCustomerFilter] = useState("");
   const [employeeFilter, setEmployeeFilter] = useState("");
 
-  // Placeholder for filter handler (adjust filtering logic as needed)
   const handleFilterChange = () => {
+    // You can implement filtering logic or API calls here
     console.log("Filters applied:", {
       customerName: customerFilter,
       contactedEmployee: employeeFilter,
     });
   };
 
-  return (
-    <div className="sales-calls-dashboard" style={{ padding: "20px" }}>
-      <h1>Sales Calls Dashboard</h1>
+  const filteredSalesCalls = dummySalesCalls.filter(
+    (call) =>
+      (customerFilter
+        ? call.customerName.toLowerCase().includes(customerFilter.toLowerCase())
+        : true) &&
+      (employeeFilter
+        ? call.contactedEmployee.toLowerCase().includes(employeeFilter.toLowerCase())
+        : true)
+  );
 
-      {/* Add Sales Call Button */}
-      <div style={{ marginBottom: "20px" }}>
+  return (
+    <div className="dashboard-page">
+      {/* Page Header */}
+      <div className="page-header">
+        <h2>Sales Calls Dashboard</h2>
         <Link to="/sales-calls/add">
-          <button>Add Sales Call</button>
+          <button className="primary-btn">Add Sales Call</button>
         </Link>
       </div>
 
       {/* Filters Section */}
-      <div className="filters" style={{ marginBottom: "20px" }}>
-        <div style={{ marginBottom: "10px" }}>
-          <label style={{ marginRight: "10px" }}>Customer Name:</label>
+      <div className="search-filter-bar">
+        <div className="filter-group">
+          <label>Customer Name:</label>
           <input
             type="text"
             value={customerFilter}
@@ -70,8 +76,8 @@ const SalesCallsDashboard: React.FC = () => {
             placeholder="Enter customer name"
           />
         </div>
-        <div style={{ marginBottom: "10px" }}>
-          <label style={{ marginRight: "10px" }}>Contacted Employee:</label>
+        <div className="filter-group">
+          <label>Contacted Employee:</label>
           <input
             type="text"
             value={employeeFilter}
@@ -79,53 +85,40 @@ const SalesCallsDashboard: React.FC = () => {
             placeholder="Enter contacted employee"
           />
         </div>
-        <button onClick={handleFilterChange}>Apply Filters</button>
+        <button className="apply-filters-btn" onClick={handleFilterChange}>
+          Apply Filters
+        </button>
       </div>
 
       {/* Table Section */}
-      <div className="table-container">
-        <table style={{ width: "100%", borderCollapse: "collapse" }}>
+      <div className="table-card">
+        <h3>Sales Calls</h3>
+        <table className="data-table">
           <thead>
             <tr>
-              <th style={{ border: "1px solid #ccc", padding: "8px" }}>Customer Name</th>
-              <th style={{ border: "1px solid #ccc", padding: "8px" }}>Contacts</th>
-              <th style={{ border: "1px solid #ccc", padding: "8px" }}>Contacted Employee</th>
-              <th style={{ border: "1px solid #ccc", padding: "8px" }}>Created Date</th>
-              <th style={{ border: "1px solid #ccc", padding: "8px" }}>Feedback</th>
-              <th style={{ border: "1px solid #ccc", padding: "8px" }}>Next Followup Date</th>
+              <th>Customer Name</th>
+              <th>Contacts</th>
+              <th>Contacted Employee</th>
+              <th>Created Date</th>
+              <th>Feedback</th>
+              <th>Next Followup Date</th>
             </tr>
           </thead>
           <tbody>
-            {dummySalesCalls
-              // Filter the dummy data based on customer name and contacted employee
-              .filter(
-                (call) =>
-                  (customerFilter
-                    ? call.customerName.toLowerCase().includes(customerFilter.toLowerCase())
-                    : true) &&
-                  (employeeFilter
-                    ? call.contactedEmployee.toLowerCase().includes(employeeFilter.toLowerCase())
-                    : true)
-              )
-              .map((call) => (
-                <tr key={call.id}>
-                  <td style={{ border: "1px solid #ccc", padding: "8px" }}>{call.customerName}</td>
-                  <td style={{ border: "1px solid #ccc", padding: "8px" }}>{call.contacts}</td>
-                  <td style={{ border: "1px solid #ccc", padding: "8px" }}>
-                    {call.contactedEmployee}
-                  </td>
-                  <td style={{ border: "1px solid #ccc", padding: "8px" }}>{call.createdDate}</td>
-                  <td style={{ border: "1px solid #ccc", padding: "8px" }}>{call.feedback}</td>
-                  <td style={{ border: "1px solid #ccc", padding: "8px" }}>
-                    {call.nextFollowupDate}
-                  </td>
-                </tr>
-              ))}
+            {filteredSalesCalls.map((call) => (
+              <tr key={call.id}>
+                <td>{call.customerName}</td>
+                <td>{call.contacts}</td>
+                <td>{call.contactedEmployee}</td>
+                <td>{call.createdDate}</td>
+                <td>{call.feedback}</td>
+                <td>{call.nextFollowupDate}</td>
+              </tr>
+            ))}
           </tbody>
         </table>
       </div>
     </div>
   );
 };
-
 export default SalesCallsDashboard;
