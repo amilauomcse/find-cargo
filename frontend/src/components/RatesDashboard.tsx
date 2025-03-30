@@ -1,7 +1,6 @@
-// RatesDashboard.tsx (modernized)
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import "./Dashboard.css"; // We'll define modern styles in this CSS file
+import "./Dashboard.css"; // Modern styles in this CSS file
 
 interface Rate {
   id: number;
@@ -16,6 +15,8 @@ interface Rate {
   createdDate: string;
   transitTime: string;
   type: string;
+  loadingPort: string;
+  dischargePort: string;
 }
 
 const dummyRates: Rate[] = [
@@ -32,6 +33,8 @@ const dummyRates: Rate[] = [
     createdDate: "2025-03-30",
     transitTime: "7 days",
     type: "Express",
+    loadingPort: "Port A",
+    dischargePort: "Port B",
   },
   {
     id: 2,
@@ -46,6 +49,8 @@ const dummyRates: Rate[] = [
     createdDate: "2025-03-28",
     transitTime: "10 days",
     type: "Standard",
+    loadingPort: "Port X",
+    dischargePort: "Port Y",
   },
 ];
 
@@ -100,6 +105,7 @@ const RatesDashboard: React.FC = () => {
             <option value="">Select Loading Port</option>
             <option value="Port A">Port A</option>
             <option value="Port B">Port B</option>
+            <option value="Port X">Port X</option>
           </select>
         </div>
         <div className="filter-group">
@@ -108,6 +114,7 @@ const RatesDashboard: React.FC = () => {
             <option value="">Select Discharge Port</option>
             <option value="Port C">Port C</option>
             <option value="Port D">Port D</option>
+            <option value="Port Y">Port Y</option>
           </select>
         </div>
         <div className="filter-group">
@@ -133,6 +140,8 @@ const RatesDashboard: React.FC = () => {
               <th>ETD</th>
               <th>Carrier</th>
               <th>Container Type</th>
+              <th>Loading Port</th>
+              <th>Discharge Port</th>
               <th>Sea Freight</th>
               <th>Other Cost</th>
               <th>Ex Cost</th>
@@ -149,6 +158,8 @@ const RatesDashboard: React.FC = () => {
                 <td>{rate.etd}</td>
                 <td>{rate.carrier}</td>
                 <td>{rate.containerType}</td>
+                <td>{rate.loadingPort}</td>
+                <td>{rate.dischargePort}</td>
                 <td>{rate.seaFreight}</td>
                 <td>{rate.otherCost}</td>
                 <td>{rate.exCost}</td>

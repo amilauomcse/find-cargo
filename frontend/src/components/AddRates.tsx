@@ -1,4 +1,3 @@
-// AddRates.tsx
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./FormStyles.css";
@@ -18,6 +17,10 @@ const AddRates: React.FC = () => {
   const [rateType, setRateType] = useState("");
   const [createdDate, setCreatedDate] = useState("");
 
+  // New fields
+  const [loadingPort, setLoadingPort] = useState("");
+  const [dischargePort, setDischargePort] = useState("");
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const newRate = {
@@ -32,6 +35,9 @@ const AddRates: React.FC = () => {
       transitTime,
       rateType,
       createdDate,
+      // Include new fields
+      loadingPort,
+      dischargePort,
     };
     console.log("New Rate:", newRate);
     navigate("/rates");
@@ -128,6 +134,29 @@ const AddRates: React.FC = () => {
           <label>Created Date:</label>
           <input type="date" value={createdDate} onChange={(e) => setCreatedDate(e.target.value)} />
         </div>
+
+        {/* New Loading Port Field */}
+        <div className="form-group">
+          <label>Loading Port:</label>
+          <input
+            type="text"
+            value={loadingPort}
+            onChange={(e) => setLoadingPort(e.target.value)}
+            placeholder="Enter loading port"
+          />
+        </div>
+
+        {/* New Discharge Port Field */}
+        <div className="form-group">
+          <label>Discharge Port:</label>
+          <input
+            type="text"
+            value={dischargePort}
+            onChange={(e) => setDischargePort(e.target.value)}
+            placeholder="Enter discharge port"
+          />
+        </div>
+
         <button className="submit-button" type="submit">
           Submit Rate
         </button>
