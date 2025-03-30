@@ -11,7 +11,7 @@ const ormConfig = (configService: ConfigService): TypeOrmModuleOptions => ({
   synchronize: true,
   autoLoadEntities: true,
   dropSchema: false,
-  logging: false,
+  logging: true,
   ssl:
     process.env.APP_ENV && process.env.APP_ENV != "dev"
       ? {
