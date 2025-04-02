@@ -1,179 +1,226 @@
-import React, { useState } from "react";
-import { Link } from "react-router-dom";
-import "./Dashboard.css"; // Modern styles in this CSS file
+// RatesDashboard.tsx (modernized)
+import React, { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
+import './Dashboard.css'; // We'll define modern styles in this CSS file
+import { getRates } from '../services/api';
 
 interface Rate {
-  id: number;
-  agentName: string;
-  etd: string;
-  carrier: string;
-  containerType: string;
-  seaFreight: number;
-  otherCost: number;
-  exCost: number;
-  total: number;
-  createdDate: string;
-  transitTime: string;
-  type: string;
-  loadingPort: string;
-  dischargePort: string;
+	id: number;
+	agentName: string;
+	etd: string;
+	carrier: string;
+	containerType: string;
+	seaFreight: number;
+	otherCost: number;
+	exCost: number;
+	total: number;
+	createdDate: string;
+	transitTime: string;
+	type: string;
 }
 
 const dummyRates: Rate[] = [
-  {
-    id: 1,
-    agentName: "Agent A",
-    etd: "2025-04-01",
-    carrier: "Carrier X",
-    containerType: "20ft",
-    seaFreight: 1000,
-    otherCost: 200,
-    exCost: 50,
-    total: 1250,
-    createdDate: "2025-03-30",
-    transitTime: "7 days",
-    type: "Express",
-    loadingPort: "Port A",
-    dischargePort: "Port B",
-  },
-  {
-    id: 2,
-    agentName: "Agent B",
-    etd: "2025-04-05",
-    carrier: "Carrier Y",
-    containerType: "40ft",
-    seaFreight: 1500,
-    otherCost: 300,
-    exCost: 70,
-    total: 1870,
-    createdDate: "2025-03-28",
-    transitTime: "10 days",
-    type: "Standard",
-    loadingPort: "Port X",
-    dischargePort: "Port Y",
-  },
+	{
+		id: 1,
+		agentName: 'Agent A',
+		etd: '2025-04-01',
+		carrier: 'Carrier X',
+		containerType: '20ft',
+		seaFreight: 1000,
+		otherCost: 200,
+		exCost: 50,
+		total: 1250,
+		createdDate: '2025-03-30',
+		transitTime: '7 days',
+		type: 'Express',
+	},
+	{
+		id: 2,
+		agentName: 'Agent B',
+		etd: '2025-04-05',
+		carrier: 'Carrier Y',
+		containerType: '40ft',
+		seaFreight: 1500,
+		otherCost: 300,
+		exCost: 70,
+		total: 1870,
+		createdDate: '2025-03-28',
+		transitTime: '10 days',
+		type: 'Standard',
+	},
 ];
 
 const RatesDashboard: React.FC = () => {
-  const [containerType, setContainerType] = useState("");
-  const [term, setTerm] = useState("");
-  const [loadingPort, setLoadingPort] = useState("");
-  const [dischargePort, setDischargePort] = useState("");
-  const [cargoReadyDate, setCargoReadyDate] = useState("");
+	const [rates, setRates] = useState<Rate[]>([]);
+	const [filteredRates, setFilteredRates] = useState<Rate[]>(rates);
+	const [loading, setLoading] = useState<boolean>(true);
+	const [error, setError] = useState<string | null>(null);
 
-  const handleFilterChange = () => {
-    console.log("Filters applied:", {
-      containerType,
-      term,
-      loadingPort,
-      dischargePort,
-      cargoReadyDate,
-    });
-  };
+	const [containerType, setContainerType] = useState('');
+	const [term, setTerm] = useState('');
+	const [loadingPort, setLoadingPort] = useState('');
+	const [dischargePort, setDischargePort] = useState('');
+	const [cargoReadyDate, setCargoReadyDate] = useState('');
 
-  return (
-    <div className="dashboard-page">
-      {/* Page Header */}
-      <div className="page-header">
-        <h2>Rates Dashboard</h2>
-        <Link to="/rates/add">
-          <button className="primary-btn">Add Rates</button>
-        </Link>
-      </div>
+	//fetch rates from API
+	useEffect(() => {
+		const fetchRates = async () => {
+			try {
+				const data = await getRates();
+				setRates(data);
+			} catch (error) {
+				setError('Failed to fetch rates');
+				console.log('error fetching rates:', error);
+			} finally {
+				setLoading(false);
+			}
+		};
+		fetchRates();
+	}, []);
 
-      {/* Filters */}
-      <div className="search-filter-bar">
-        <div className="filter-group">
-          <label>Container Type:</label>
-          <select value={containerType} onChange={(e) => setContainerType(e.target.value)}>
-            <option value="">Select Container Type</option>
-            <option value="20ft">20ft</option>
-            <option value="40ft">40ft</option>
-          </select>
-        </div>
-        <div className="filter-group">
-          <label>Term:</label>
-          <select value={term} onChange={(e) => setTerm(e.target.value)}>
-            <option value="">Select Term</option>
-            <option value="short">Short Term</option>
-            <option value="long">Long Term</option>
-          </select>
-        </div>
-        <div className="filter-group">
-          <label>Loading Port:</label>
-          <select value={loadingPort} onChange={(e) => setLoadingPort(e.target.value)}>
-            <option value="">Select Loading Port</option>
-            <option value="Port A">Port A</option>
-            <option value="Port B">Port B</option>
-            <option value="Port X">Port X</option>
-          </select>
-        </div>
-        <div className="filter-group">
-          <label>Discharge Port:</label>
-          <select value={dischargePort} onChange={(e) => setDischargePort(e.target.value)}>
-            <option value="">Select Discharge Port</option>
-            <option value="Port C">Port C</option>
-            <option value="Port D">Port D</option>
-            <option value="Port Y">Port Y</option>
-          </select>
-        </div>
-        <div className="filter-group">
-          <label>Cargo Ready Date:</label>
-          <input
-            type="date"
-            value={cargoReadyDate}
-            onChange={(e) => setCargoReadyDate(e.target.value)}
-          />
-        </div>
-        <button className="apply-filters-btn" onClick={handleFilterChange}>
-          Apply Filters
-        </button>
-      </div>
+  
+	if (loading) return <p>Loading rates...</p>;
 
-      {/* Table Section */}
-      <div className="table-card">
-        <h3>Rates</h3>
-        <table className="data-table">
-          <thead>
-            <tr>
-              <th>Agent Name</th>
-              <th>ETD</th>
-              <th>Carrier</th>
-              <th>Container Type</th>
-              <th>Loading Port</th>
-              <th>Discharge Port</th>
-              <th>Sea Freight</th>
-              <th>Other Cost</th>
-              <th>Ex Cost</th>
-              <th>Total</th>
-              <th>Transit Time</th>
-              <th>Type</th>
-              <th>Created Date</th>
-            </tr>
-          </thead>
-          <tbody>
-            {dummyRates.map((rate) => (
-              <tr key={rate.id}>
-                <td>{rate.agentName}</td>
-                <td>{rate.etd}</td>
-                <td>{rate.carrier}</td>
-                <td>{rate.containerType}</td>
-                <td>{rate.loadingPort}</td>
-                <td>{rate.dischargePort}</td>
-                <td>{rate.seaFreight}</td>
-                <td>{rate.otherCost}</td>
-                <td>{rate.exCost}</td>
-                <td>{rate.total}</td>
-                <td>{rate.transitTime}</td>
-                <td>{rate.type}</td>
-                <td>{rate.createdDate}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    </div>
-  );
+	const handleFilterChange = () => {
+		console.log('Filters applied:', {
+			containerType,
+			term,
+			loadingPort,
+			dischargePort,
+			cargoReadyDate,
+		});
+
+		const newFilteredRates = rates.filter(
+			(rate) =>
+				(containerType ? rate.containerType === containerType : true) &&
+				(term ? rate.type === term : true) &&
+				(loadingPort ? rate.agentName === loadingPort : true) &&
+				(dischargePort ? rate.carrier === dischargePort : true) &&
+				(cargoReadyDate ? rate.etd === cargoReadyDate : true)
+		);
+		setFilteredRates(newFilteredRates);
+	};
+
+	// if (error) return <p className="error">{error}</p>;
+
+	return (
+		<div className="dashboard-page">
+			{/* Page Header */}
+			<div className="page-header">
+				<h2>Rates Dashboard</h2>
+				<Link to="/rates/add">
+					<button className="primary-btn">Add Rates</button>
+				</Link>
+			</div>
+
+			{/* Filters */}
+			<div className="search-filter-bar">
+				<div className="filter-group">
+					<label>Container Type:</label>
+					<select
+						value={containerType}
+						onChange={(e) => setContainerType(e.target.value)}>
+						<option value="">Select Container Type</option>
+						<option value="20ft">20ft</option>
+						<option value="40ft">40ft</option>
+					</select>
+				</div>
+				<div className="filter-group">
+					<label>Term:</label>
+					<select
+						value={term}
+						onChange={(e) => setTerm(e.target.value)}>
+						<option value="">Select Term</option>
+						<option value="short">Short Term</option>
+						<option value="long">Long Term</option>
+					</select>
+				</div>
+				<div className="filter-group">
+					<label>Loading Port:</label>
+					<select
+						value={loadingPort}
+						onChange={(e) => setLoadingPort(e.target.value)}>
+						<option value="">Select Loading Port</option>
+						<option value="Port A">Port A</option>
+						<option value="Port B">Port B</option>
+					</select>
+				</div>
+				<div className="filter-group">
+					<label>Discharge Port:</label>
+					<select
+						value={dischargePort}
+						onChange={(e) => setDischargePort(e.target.value)}>
+						<option value="">Select Discharge Port</option>
+						<option value="Port C">Port C</option>
+						<option value="Port D">Port D</option>
+					</select>
+				</div>
+				<div className="filter-group">
+					<label>Cargo Ready Date:</label>
+					<input
+						type="date"
+						value={cargoReadyDate}
+						onChange={(e) => setCargoReadyDate(e.target.value)}
+					/>
+				</div>
+				<button
+					className="apply-filters-btn"
+					onClick={handleFilterChange}>
+					Apply Filters
+				</button>
+			</div>
+
+			{/* Table Section */}
+			<div className="table-card">
+				<h3>Rates</h3>
+				<table className="data-table">
+					<thead>
+						<tr>
+							<th>Agent Name</th>
+							<th>ETD</th>
+							<th>Carrier</th>
+							<th>Container Type</th>
+							<th>Sea Freight</th>
+							<th>Other Cost</th>
+							<th>Ex Cost</th>
+							<th>Total</th>
+							<th>Transit Time</th>
+							<th>Type</th>
+							<th>Created Date</th>
+						</tr>
+					</thead>
+					<tbody>
+						{filteredRates.length > 0 ? (
+							filteredRates.map((rate) => (
+								<tr key={rate.id}>
+									<td>{rate.agentName}</td>
+									<td>{rate.etd}</td>
+									<td>{rate.carrier}</td>
+									<td>{rate.containerType}</td>
+									<td>{rate.seaFreight}</td>
+									<td>{rate.otherCost}</td>
+									<td>{rate.exCost}</td>
+									<td>{rate.total}</td>
+									<td>{rate.transitTime}</td>
+									<td>{rate.type}</td>
+									<td>{rate.createdDate}</td>
+								</tr>
+							))
+						) : (
+							<tr>
+								<td
+									colSpan={11}
+									style={{ textAlign: 'center' }}>
+									No rates found.
+								</td>
+							</tr>
+						)}
+					</tbody>
+				</table>
+			</div>
+		</div>
+	);
+
 };
 
 export default RatesDashboard;
