@@ -78,6 +78,7 @@ const RatesDashboard: React.FC = () => {
 		fetchRates();
 	}, []);
 
+  
 	if (loading) return <p>Loading rates...</p>;
 
 	const handleFilterChange = () => {
@@ -219,6 +220,7 @@ const RatesDashboard: React.FC = () => {
 			</div>
 		</div>
 	);
+
 };
 
 export default RatesDashboard;

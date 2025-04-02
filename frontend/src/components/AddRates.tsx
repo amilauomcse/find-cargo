@@ -20,6 +20,8 @@ const AddRates: React.FC = () => {
 		rateType: '',
 		createdDate: '',
 		type: '' as 'Export' | 'Import',
+    loadingPort:'',
+    dischargePort:'',
 	});
 
 	const handleSubmit = async (e: React.FormEvent) => {
@@ -40,6 +42,8 @@ const AddRates: React.FC = () => {
 				rateType: '',
 				createdDate: '',
 				type: '' as 'Export' | 'Import',
+        loadingPort:'',
+        dischargePort:'',
 			});
 			console.log('new rate:', ratesData);
 			navigate('/rates');
@@ -162,6 +166,27 @@ const AddRates: React.FC = () => {
 						<option value="Import">Import</option>
 					</select>
 				</div>
+        {/* New Loading Port Field */}
+        <div className="form-group">
+          <label>Loading Port:</label>
+          <input
+            type="text"
+            value={newRate.loadingPort}
+            onChange={(e) => e.target.value}
+            placeholder="Enter loading port"
+          />
+        </div>
+
+        {/* New Discharge Port Field */}
+        <div className="form-group">
+          <label>Discharge Port:</label>
+          <input
+            type="text"
+            value={newRate.dischargePort}
+            onChange={(e) => e.target.value}
+            placeholder="Enter discharge port"
+          />
+        </div>
 				<button className="submit-button" type="submit">
 					Submit Rate
 				</button>

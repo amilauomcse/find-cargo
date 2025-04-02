@@ -1,20 +1,25 @@
-import { ConfigModule } from "@nestjs/config";
+import { ConfigModule, ConfigService } from "@nestjs/config";
 import { Module } from "@nestjs/common";
 import { TypeOrmModule } from "@nestjs/typeorm";
+import configuration from "@app/core/config/configuration";
+import ormConfig from "@app/core/config/orm-config";
+import { CoreModule } from "@app/core";
+import { SharedModule } from "@app/shared";
 
 @Module({
   imports: [
-    ConfigModule.forRoot(),
-    TypeOrmModule.forRoot({
-      type: "postgres",
-      host: process.env.DATABASE_HOST || "localhost",
-      port: parseInt(process.env.DATABASE_PORT, 10) || 5433,
-      username: process.env.DATABASE_USER || "postgres",
-      password: process.env.DATABASE_PASSWORD || "postgres",
-      database: process.env.DATABASE_NAME || "cargo_db",
-      autoLoadEntities: true,
-      synchronize: true, // Only for development, disable in production
+    ConfigModule.forRoot({
+      isGlobal: true,
+      load: [configuration],
+      envFilePath: ".env",
     }),
+    TypeOrmModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => ormConfig(configService),
+    }),
+    CoreModule,
+    SharedModule,
   ],
 })
 export class AppModule {}
