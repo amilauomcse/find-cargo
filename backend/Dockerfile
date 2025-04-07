@@ -29,4 +29,4 @@ COPY package.json .
 
 EXPOSE 3000 3001
 
-CMD ["node", "dist/main.js"]
+yarn start
