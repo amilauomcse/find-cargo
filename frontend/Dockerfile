@@ -5,10 +5,10 @@ RUN corepack enable && corepack prepare pnpm@latest --activate
 
 WORKDIR /app
 COPY yarn.lock package.json ./
-RUN pnpm install --frozen-lockfile
+RUN yarn install --frozen-lockfile
 
 COPY . .
-RUN pnpm run build          # → creates /app/build
+RUN yarn run build          # → creates /app/build
 
 ####################  runtime stage  ####################
 FROM nginx:1.25-alpine
