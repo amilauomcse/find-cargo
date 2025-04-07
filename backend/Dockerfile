@@ -7,12 +7,12 @@ RUN corepack enable && corepack prepare pnpm@latest --activate
 WORKDIR /app
 
 # Copy manifests and install ALL dependencies (dev + prod)
-COPY pnpm-lock.yaml package.json ./
-RUN pnpm install --frozen-lockfile
+COPY yarn.lock package.json ./
+RUN yarn install --frozen-lockfile
 
 # Copy the rest of the backend source and build it
 COPY . .
-RUN pnpm run build            # outputs to dist/
+RUN yarn run build            # outputs to dist/
 
 ####################  runtime stage  ####################
 FROM node:20-alpine

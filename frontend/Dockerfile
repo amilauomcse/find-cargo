@@ -7,12 +7,12 @@ RUN corepack enable && corepack prepare pnpm@latest --activate
 WORKDIR /app
 
 # Copy manifests and install deps
-COPY pnpm-lock.yaml package.json ./
-RUN pnpm install --frozen-lockfile
+COPY yarn.lock package.json ./
+RUN yarn install --frozen-lockfile
 
 # Copy the rest of the source and build
 COPY . .
-RUN pnpm run build            # output → dist/
+RUN yarn run build            # output → dist/
 
 ####################  runtime stage  ####################
 FROM nginx:1.25-alpine
