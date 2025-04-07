@@ -20,7 +20,7 @@ FROM node:20-alpine
 # (Optional) keep pnpm available
 RUN corepack enable && corepack prepare pnpm@latest --activate
 
-WORKDIR /app
+# WORKDIR /app
 
 # Copy compiled code and production‑only node_modules
 COPY --from=builder /app/dist ./dist
