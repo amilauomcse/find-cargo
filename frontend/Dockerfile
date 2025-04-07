@@ -16,5 +16,5 @@ FROM nginx:1.25-alpine
 # Copy CRA build output into Nginx
 COPY --from=builder /app/build /usr/share/nginx/html
 
-EXPOSE 80
+EXPOSE 3030
 CMD ["nginx", "-g", "daemon off;"]
