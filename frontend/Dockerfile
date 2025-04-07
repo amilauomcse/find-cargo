@@ -17,4 +17,5 @@ FROM nginx:1.25-alpine
 COPY --from=builder /app/build /usr/share/nginx/html
 
 EXPOSE 3030
-CMD ["nginx", "-g", "daemon off;"]
+
+yarn start
