@@ -8,17 +8,18 @@ on:
       - '.github/workflows/frontend.yml'
 
 env:
-  ECR_REPO: my-cargo-frontend            # name of the ECR repo
-  IMAGE_TAG: ${{ github.sha }}           # commit SHA
+  ECR_REPO: my-cargo-frontend
+  IMAGE_TAG: ${{ github.sha }}
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
+      # ─────────── Checkout ───────────
       - uses: actions/checkout@v4
 
-      # ---------- AWS credentials ----------
+      # ─────────── AWS creds ──────────
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
@@ -26,32 +27,43 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region:            ${{ secrets.AWS_REGION }}
 
-      # ---------- ECR login ----------
-      - name: Login to Amazon ECR
-        uses: aws-actions/amazon-ecr-login@v2
+      # ─────────── ECR login ──────────
+      - uses: aws-actions/amazon-ecr-login@v2
+        name: Login to Amazon ECR
 
-      # ---------- Build & push ----------
+      # ───────── Build & push image ───
       - name: Build and push Docker image
         run: |
-          IMAGE_URI=${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/$ECR_REPO
-          
-          docker build -t $IMAGE_URI:$IMAGE_TAG frontend
+          ACCOUNT=${{ secrets.AWS_ACCOUNT_ID }}
+          REGION=${{ secrets.AWS_REGION }}
+          IMAGE_URI=$ACCOUNT.dkr.ecr.$REGION.amazonaws.com/$ECR_REPO
+
+          docker build -f frontend/Dockerfile -t $IMAGE_URI:$IMAGE_TAG frontend
           docker tag  $IMAGE_URI:$IMAGE_TAG $IMAGE_URI:latest
-          
           docker push $IMAGE_URI:$IMAGE_TAG
           docker push $IMAGE_URI:latest
 
-      # ---------- Deploy on EC2 ----------
+      # ─────────── Deploy on EC2 ───────
       - name: Deploy on EC2 host
         uses: appleboy/ssh-action@v1
         with:
           host:     ${{ secrets.EC2_HOST }}
-          username: ec2-user                 # or ubuntu
+          username: ec2-user            # or ubuntu
           key:      ${{ secrets.EC2_SSH_KEY }}
+          envs:     AWS_REGION,AWS_ACCOUNT_ID,ECR_REPO,IMAGE_TAG
           script: |
-            IMAGE_URI=${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/$ECR_REPO
+            set -e
+            REGION=${AWS_REGION}
+            ACCOUNT=${AWS_ACCOUNT_ID}
+            IMAGE_URI=$ACCOUNT.dkr.ecr.$REGION.amazonaws.com/$ECR_REPO
+
+            # Login to ECR
             aws ecr get-login-password --region $REGION | \
-            docker login --username AWS --password-stdin $ACCOUNT.dkr.ecr.$REGION.amazonaws.com
+              docker login --username AWS --password-stdin $ACCOUNT.dkr.ecr.$REGION.amazonaws.com
+
+            # Pull new images
             docker pull $IMAGE_URI:$IMAGE_TAG
             docker pull $IMAGE_URI:latest
-            docker-compose -f /docker-compose.yml up -d frontend
+
+            # Restart frontend service
+            docker compose -f /docker-compose.yml up -d frontend

@@ -1,27 +1,20 @@
 ####################  build stage  ####################
 FROM node:20-alpine AS builder
 
-# Enable pnpm via Corepack
 RUN corepack enable && corepack prepare pnpm@latest --activate
 
 WORKDIR /app
+COPY pnpm-lock.yaml package.json ./
+RUN pnpm install --frozen-lockfile
 
-# Copy manifests and install deps
-COPY yarn.lock package.json ./
-RUN yarn install --frozen-lockfile
-
-# Copy the rest of the source and build
 COPY . .
-RUN yarn run build            # output → dist/
+RUN pnpm run build          # → creates /app/build
 
 ####################  runtime stage  ####################
 FROM nginx:1.25-alpine
 
-# Copy built files into Nginx html folder
-COPY --from=builder /app/dist /usr/share/nginx/html
-
-# Optional: custom Nginx config
-# COPY nginx.conf /etc/nginx/conf.d/default.conf
+# Copy CRA build output into Nginx
+COPY --from=builder /app/build /usr/share/nginx/html
 
 EXPOSE 80
 CMD ["nginx", "-g", "daemon off;"]
