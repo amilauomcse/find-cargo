@@ -29,4 +29,4 @@ COPY package.json .
 
 EXPOSE 3000 3001
 
-yarn start
+CMD ["yarn", "start"]
