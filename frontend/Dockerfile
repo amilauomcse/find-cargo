@@ -4,7 +4,7 @@ FROM node:20-alpine AS builder
 RUN corepack enable && corepack prepare pnpm@latest --activate
 
 WORKDIR /app
-COPY pnpm-lock.yaml package.json ./
+COPY yarn.lock package.json ./
 RUN pnpm install --frozen-lockfile
 
 COPY . .
