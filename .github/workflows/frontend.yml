@@ -1,45 +1,55 @@
 name: Build & Deploy Frontend
+
 on:
   push:
+    branches: [ main ]
     paths:
       - 'frontend/**'
       - '.github/workflows/frontend.yml'
-    branches: [ main ]
+
+env:
+  ECR_REPO: my-cargo-frontend            # name of the ECR repo
+  IMAGE_TAG: ${{ github.sha }}           # commit SHA
 
 jobs:
-  build:
+  build-and-deploy:
     runs-on: ubuntu-latest
-    env:
-      ECR_REPO: my-cargo-frontend
-      IMAGE_TAG: ${{ github.sha }}
+
     steps:
       - uses: actions/checkout@v4
 
-      - name: Configure AWS creds
+      # ---------- AWS credentials ----------
+      - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-access-key-id:     ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ secrets.AWS_REGION }}
+          aws-region:            ${{ secrets.AWS_REGION }}
 
-      - name: Login to ECR
+      # ---------- ECR login ----------
+      - name: Login to Amazon ECR
         uses: aws-actions/amazon-ecr-login@v2
 
-      - name: Build & push image
+      # ---------- Build & push ----------
+      - name: Build and push Docker image
         run: |
-          docker build -t $ECR_REPO:$IMAGE_TAG frontend
-          docker tag  $ECR_REPO:$IMAGE_TAG \
-            $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPO:$IMAGE_TAG
-          docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPO:$IMAGE_TAG
+          IMAGE_URI=${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/$ECR_REPO
+          
+          docker build -t $IMAGE_URI:$IMAGE_TAG frontend
+          docker tag  $IMAGE_URI:$IMAGE_TAG $IMAGE_URI:latest
+          
+          docker push $IMAGE_URI:$IMAGE_TAG
+          docker push $IMAGE_URI:latest
 
-      - name: Deploy via SSH
+      # ---------- Deploy on EC2 ----------
+      - name: Deploy on EC2 host
         uses: appleboy/ssh-action@v1
         with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ec2-user
-          key: ${{ secrets.EC2_SSH_KEY }}
+          host:     ${{ secrets.EC2_HOST }}
+          username: ec2-user                 # or ubuntu
+          key:      ${{ secrets.EC2_SSH_KEY }}
           script: |
-            docker pull $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPO:$IMAGE_TAG
-            docker-compose -f /opt/myapp/docker-compose.yml up -d frontend
-            docker tag $ECR_REPO:$IMAGE_TAG $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPO:latest
-            docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPO:latest
+            IMAGE_URI=${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/$ECR_REPO
+            docker pull $IMAGE_URI:$IMAGE_TAG
+            docker pull $IMAGE_URI:latest
+            docker-compose -f /docker-compose.yml up -d frontend
