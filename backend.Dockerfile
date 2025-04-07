@@ -1,21 +1,35 @@
-# Use Node.js base image
-FROM node:18-alpine
+# ---------- build stage ----------
+    FROM node:20-alpine AS builder
 
-# Set working directory
-WORKDIR /app
-
-# Copy package.json and install dependencies
-COPY backend/package.json backend/yarn.lock ./
-RUN npm install
-
-# Copy source code
-COPY backend .
-
-# Build the NestJS apps
-RUN npm run build
-
-# Expose ports for both API and Auth
-EXPOSE 3000 3001
-
-# Start both API and Auth services
-CMD ["npm", "run", "start:dev"]
+    # Enable pnpm via Corepack
+    RUN corepack enable && corepack prepare pnpm@latest --activate
+    
+    WORKDIR /app
+    
+    # Copy manifests and install ALL deps (dev + prod)
+    COPY backend/pnpm-lock.yaml backend/package.json ./
+    RUN pnpm install --frozen-lockfile
+    
+    # Copy source and build
+    COPY backend .
+    RUN pnpm run build          # creates dist/ …
+    
+    # ---------- runtime stage ----------
+    FROM node:20-alpine
+    
+    # Optional: keep pnpm available
+    RUN corepack enable && corepack prepare pnpm@latest --activate
+    
+    WORKDIR /app
+    
+    # Copy compiled code and production deps only
+    COPY --from=builder /app/dist ./dist
+    COPY --from=builder /app/node_modules ./node_modules
+    COPY backend/package.json .
+    
+    # Expose the ports your Nest apps listen on
+    EXPOSE 3000 3001
+    
+    # Start in production mode (adjust paths if you have multiple apps)
+    CMD ["node", "dist/main.js"]
+    

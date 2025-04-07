@@ -1,23 +1,24 @@
-# Use Node.js base image
-FROM node:18-alpine
+# ---------- build stage ----------
+    FROM node:20-alpine AS builder
 
-# Set working directory
-WORKDIR /app
-
-# Copy package.json and package-lock.json
-COPY frontend/package*.json ./
-
-# Install dependencies
-RUN npm install
-
-# Copy source code
-COPY frontend .
-
-# Build React app
-RUN npm run build
-
-# Expose the port
-EXPOSE 5173
-
-# Serve the built app using a simple HTTP server
-CMD ["npx", "serve", "-s", "build", "-l", "5173"]
+    RUN corepack enable && corepack prepare pnpm@latest --activate
+    
+    WORKDIR /app
+    COPY frontend/pnpm-lock.yaml frontend/package.json ./
+    RUN pnpm install --frozen-lockfile
+    
+    COPY frontend .
+    RUN pnpm run build          # outputs to dist/ by default
+    
+    # ---------- runtime stage ----------
+    FROM nginx:1.25-alpine
+    
+    # Copy built files into Nginx html folder
+    COPY --from=builder /app/dist /usr/share/nginx/html
+    
+    # (Optional) custom Nginx config
+    # COPY frontend/nginx.conf /etc/nginx/conf.d/default.conf
+    
+    EXPOSE 80
+    CMD ["nginx", "-g", "daemon off;"]
+    
