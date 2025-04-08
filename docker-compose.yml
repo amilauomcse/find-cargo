@@ -31,13 +31,14 @@ services:
 
   frontend:
     build:
-      context: .
-      dockerfile: frontend/Dockerfile
+      context: . # build in frontend folder
+      dockerfile: /frontend/Dockerfile
     container_name: react_frontend
     ports:
-      - "5173:5173"
+      - "3030:3030" # host:container
     depends_on:
       - api
+      - db
     networks:
       - my_network
 
