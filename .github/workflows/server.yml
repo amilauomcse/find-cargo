@@ -111,3 +111,4 @@ jobs:
           key:      ${{ secrets.EC2_SSH_KEY }}
           script: |
             /opt/scripts/deploy.sh frontend ${{ env.IMAGE_TAG }}
+            
