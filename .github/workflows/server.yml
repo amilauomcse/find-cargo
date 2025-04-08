@@ -68,16 +68,7 @@ jobs:
           username: ec2-user
           key:      ${{ secrets.EC2_SSH_KEY }}
           script: |
-            REGION=${{ secrets.AWS_REGION }}
-            ACCOUNT=${{ secrets.AWS_ACCOUNT_ID }}
-            IMAGE_URI=$ACCOUNT.dkr.ecr.$REGION.amazonaws.com/${{ env.ECR_REPO }}
-
-            aws ecr get-login-password --region $REGION | \
-              docker login --username AWS --password-stdin $ACCOUNT.dkr.ecr.$REGION.amazonaws.com
-
-            docker pull $IMAGE_URI:${{ env.IMAGE_TAG }}
-            docker pull $IMAGE_URI:latest
-            docker compose -f /docker-compose.yml up -d backend
+            /opt/scripts/deploy.sh frontend ${{ env.IMAGE_TAG }}
 
 # ─────────────────────────────────────────────────────────────
 # 3)  Build & deploy FRONTEND  (runs only if frontend==true)
@@ -119,13 +110,4 @@ jobs:
           username: ec2-user
           key:      ${{ secrets.EC2_SSH_KEY }}
           script: |
-            REGION=${{ secrets.AWS_REGION }}
-            ACCOUNT=${{ secrets.AWS_ACCOUNT_ID }}
-            IMAGE_URI=$ACCOUNT.dkr.ecr.$REGION.amazonaws.com/${{ env.ECR_REPO }}
-
-            aws ecr get-login-password --region $REGION | \
-              docker login --username AWS --password-stdin $ACCOUNT.dkr.ecr.$REGION.amazonaws.com
-
-            docker pull $IMAGE_URI:${{ env.IMAGE_TAG }}
-            docker pull $IMAGE_URI:latest
-            docker compose -f /docker-compose.yml up -d frontend
+            /opt/scripts/deploy.sh frontend ${{ env.IMAGE_TAG }}
