@@ -2,7 +2,7 @@ import React from 'react';
 import axios from 'axios';
 
 const api = axios.create({
-	baseURL: 'https://localhost:3000',
+	baseURL: 'http://localhost:3003',
 	timeout: 5000,
 	headers: {
 		'Content-Type': 'application/json',
@@ -15,9 +15,10 @@ interface InquiryData {
 	portOfLoading: string;
 	portOfDischarge: string;
 	createdDate: string;
-	rateOffered: string;
+	offeredRate: number;
 	clientName: string;
-	clientContact: string;
+	clientContactNo: string;
+	clientContactEmail: string;
 	feedback: string;
 	status: string;
 	addedBy: string;
@@ -32,24 +33,30 @@ interface RatesData {
 	otherCost: number;
 	exCost: number;
 	total: number;
-	createdDate: string;
 	transitTime: string;
+	rateType: string;
+	createdDate: string;
 	type: string;
+	loadingPort: string;
+	dischargePort: string;
 }
 
 interface SalesCallData {
-	customerName: string;
-	contacts: string;
+	companyName: string;
 	contactedEmployee: string;
-	createdDate: string;
+	contactNo: string;
+	contactEmail: string;
 	feedback: string;
-	nextFollowupDate: string;
+	createdDate: string;
+	followUpDate: string;
+	agentName: string;
 }
 
 // Add a new inquiry
 export const addInquiry = async (inquiryData: InquiryData) => {
+	console.log('inquiry data: ', inquiryData);
 	try {
-		const response = await api.post('/inquery/add', inquiryData);
+		const response = await api.post('/inquiries/add', inquiryData);
 		return response.data;
 	} catch (error) {
 		console.error('Error adding inquiry:', error);

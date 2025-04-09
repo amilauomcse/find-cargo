@@ -10,47 +10,19 @@ interface Inquiry {
 	portOfLoading: string;
 	portOfDischarge: string;
 	createdDate: string;
-	rateOffered: number;
+	offeredRate: number;
 	clientName: string;
-	clientContact: string;
+	clientContactNo: string;
+	clientContactEmail: string;
 	feedback: string;
 	status: string;
 	addedBy: string;
 }
 
-const dummyInquiries: Inquiry[] = [
-	{
-		id: 1,
-		type: 'Export',
-		method: 'Sea Freight',
-		portOfLoading: 'Port A',
-		portOfDischarge: 'Port B',
-		createdDate: '2025-03-25',
-		rateOffered: 1500,
-		clientName: 'Client X',
-		clientContact: '123-456-7890',
-		feedback: 'Positive',
-		status: 'Open',
-		addedBy: 'User 1',
-	},
-	{
-		id: 2,
-		type: 'Import',
-		method: 'Air Freight',
-		portOfLoading: 'Port C',
-		portOfDischarge: 'Port D',
-		createdDate: '2025-03-27',
-		rateOffered: 2000,
-		clientName: 'Client Y',
-		clientContact: '987-654-3210',
-		feedback: 'Pending',
-		status: 'Closed',
-		addedBy: 'User 2',
-	},
-];
-
 const InquiriesDashboard: React.FC = () => {
 	const [inquiries, setInquiries] = useState<Inquiry[]>([]);
+	const [filteredInquiries, setFilteredInquiries] =
+		useState<Inquiry[]>(inquiries);
 	const [loading, setLoading] = useState<boolean>(true);
 	const [error, setError] = useState<string | null>(null);
 
@@ -64,6 +36,7 @@ const InquiriesDashboard: React.FC = () => {
 			try {
 				const data = await getInquiries();
 				setInquiries(data);
+				setFilteredInquiries(data);
 			} catch (error) {
 				setError('Failed to fetch inquiries');
 			} finally {
@@ -82,17 +55,24 @@ const InquiriesDashboard: React.FC = () => {
 			addedBy: addedByFilter,
 			status: statusFilter,
 		});
+
+		const newFilteredInquiries = inquiries.filter(
+			(inquiry) =>
+				(addedByFilter
+					? inquiry.addedBy
+							.toLowerCase()
+							.includes(addedByFilter.toLowerCase())
+					: true) &&
+				(statusFilter ? inquiry.status === statusFilter : true)
+		);
+		setFilteredInquiries(newFilteredInquiries);
 	};
 
-	const filteredInquiries = inquiries.filter(
-		(inquiry) =>
-			(addedByFilter
-				? inquiry.addedBy
-						.toLowerCase()
-						.includes(addedByFilter.toLowerCase())
-				: true) &&
-			(statusFilter ? inquiry.status === statusFilter : true)
-	);
+	const clearFilters = () => {
+		setAddedByFilter('');
+		setStatusFilter('');
+		setFilteredInquiries(inquiries);
+	};
 
 	return (
 		<div className="dashboard-page">
@@ -130,6 +110,9 @@ const InquiriesDashboard: React.FC = () => {
 					onClick={handleFilterChange}>
 					Apply Filters
 				</button>
+				<button className="clear-filters-btn" onClick={clearFilters}>
+					Clear Filters
+				</button>
 			</div>
 
 			{/* Table Section */}
@@ -145,7 +128,8 @@ const InquiriesDashboard: React.FC = () => {
 							<th>Created Date</th>
 							<th>Rate Offered</th>
 							<th>Client Name</th>
-							<th>Client Contact</th>
+							<th>Client Contact No</th>
+							<th>Client Contact Email</th>
 							<th>Feedback</th>
 							<th>Status</th>
 							<th>Added By</th>
@@ -160,9 +144,10 @@ const InquiriesDashboard: React.FC = () => {
 									<td>{inquiry.portOfLoading}</td>
 									<td>{inquiry.portOfDischarge}</td>
 									<td>{inquiry.createdDate}</td>
-									<td>{inquiry.rateOffered}</td>
+									<td>{inquiry.offeredRate}</td>
 									<td>{inquiry.clientName}</td>
-									<td>{inquiry.clientContact}</td>
+									<td>{inquiry.clientContactNo}</td>
+									<td>{inquiry.clientContactEmail}</td>
 									<td>{inquiry.feedback}</td>
 									<td>{inquiry.status}</td>
 									<td>{inquiry.addedBy}</td>

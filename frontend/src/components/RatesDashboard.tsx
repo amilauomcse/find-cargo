@@ -14,41 +14,13 @@ interface Rate {
 	otherCost: number;
 	exCost: number;
 	total: number;
-	createdDate: string;
 	transitTime: string;
+	rateType: string;
+	createdDate: string;
 	type: string;
+	loadingPort: string;
+	dischargePort: string;
 }
-
-const dummyRates: Rate[] = [
-	{
-		id: 1,
-		agentName: 'Agent A',
-		etd: '2025-04-01',
-		carrier: 'Carrier X',
-		containerType: '20ft',
-		seaFreight: 1000,
-		otherCost: 200,
-		exCost: 50,
-		total: 1250,
-		createdDate: '2025-03-30',
-		transitTime: '7 days',
-		type: 'Express',
-	},
-	{
-		id: 2,
-		agentName: 'Agent B',
-		etd: '2025-04-05',
-		carrier: 'Carrier Y',
-		containerType: '40ft',
-		seaFreight: 1500,
-		otherCost: 300,
-		exCost: 70,
-		total: 1870,
-		createdDate: '2025-03-28',
-		transitTime: '10 days',
-		type: 'Standard',
-	},
-];
 
 const RatesDashboard: React.FC = () => {
 	const [rates, setRates] = useState<Rate[]>([]);
@@ -68,6 +40,7 @@ const RatesDashboard: React.FC = () => {
 			try {
 				const data = await getRates();
 				setRates(data);
+				setFilteredRates(data);
 			} catch (error) {
 				setError('Failed to fetch rates');
 				console.log('error fetching rates:', error);
@@ -78,7 +51,6 @@ const RatesDashboard: React.FC = () => {
 		fetchRates();
 	}, []);
 
-  
 	if (loading) return <p>Loading rates...</p>;
 
 	const handleFilterChange = () => {
@@ -99,6 +71,15 @@ const RatesDashboard: React.FC = () => {
 				(cargoReadyDate ? rate.etd === cargoReadyDate : true)
 		);
 		setFilteredRates(newFilteredRates);
+	};
+
+	const clearFilters = () => {
+		setContainerType('');
+		setTerm('');
+		setLoadingPort('');
+		setDischargePort('');
+		setCargoReadyDate('');
+		setFilteredRates(rates);
 	};
 
 	// if (error) return <p className="error">{error}</p>;
@@ -168,6 +149,9 @@ const RatesDashboard: React.FC = () => {
 					onClick={handleFilterChange}>
 					Apply Filters
 				</button>
+				<button className="clear-filters-btn" onClick={clearFilters}>
+					Clear Filters
+				</button>
 			</div>
 
 			{/* Table Section */}
@@ -185,8 +169,11 @@ const RatesDashboard: React.FC = () => {
 							<th>Ex Cost</th>
 							<th>Total</th>
 							<th>Transit Time</th>
-							<th>Type</th>
+							<th>Rate Type</th>
 							<th>Created Date</th>
+							<th>Type</th>
+							<th>Loading Port</th>
+							<th>Discharge Port</th>
 						</tr>
 					</thead>
 					<tbody>
@@ -202,8 +189,11 @@ const RatesDashboard: React.FC = () => {
 									<td>{rate.exCost}</td>
 									<td>{rate.total}</td>
 									<td>{rate.transitTime}</td>
-									<td>{rate.type}</td>
+									<td>{rate.rateType}</td>
 									<td>{rate.createdDate}</td>
+									<td>{rate.type}</td>
+									<td>{rate.loadingPort}</td>
+									<td>{rate.dischargePort}</td>
 								</tr>
 							))
 						) : (
@@ -220,7 +210,6 @@ const RatesDashboard: React.FC = () => {
 			</div>
 		</div>
 	);
-
 };
 
 export default RatesDashboard;
