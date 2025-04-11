@@ -1,12 +1,13 @@
 version: '3.8'
 
 services:
-<<<<<<< HEAD
     api:
         build:
             context: .
-            dockerfile: backend.Dockerfile
+            dockerfile: backend/Dockerfile
         container_name: nest_api
+        env_file:
+            - ./backend/.env
         environment:
             - DATABASE_URL=postgres://postgres:postgres@db:5432/cargo_db
         depends_on:
@@ -19,7 +20,7 @@ services:
     auth:
         build:
             context: .
-            dockerfile: backend.Dockerfile
+            dockerfile: backend/Dockerfile
         container_name: nest_auth
         environment:
             - DATABASE_URL=postgres://postgres:postgres@db:5432/cargo_db
@@ -32,57 +33,18 @@ services:
 
     frontend:
         build:
-            context: .
-            dockerfile: frontend.Dockerfile
+            context: . # build in frontend folder
+            dockerfile: /frontend/Dockerfile
+            args:
+                REACT_APP_API_BASE_URL: ${REACT_APP_API_BASE_URL}
         container_name: react_frontend
         ports:
-            - '5173:5173'
+            - '3030:3030' # host:container
         depends_on:
             - api
+            - db
         networks:
             - my_network
-=======
-  api:
-    build:
-      context: .
-      dockerfile: backend/Dockerfile
-    container_name: nest_api
-    environment:
-      - DATABASE_URL=postgres://postgres:postgres@db:5432/cargo_db
-    depends_on:
-      - db
-    ports:
-      - "3000:3000"
-    networks:
-      - my_network
-
-  auth:
-    build:
-      context: .
-      dockerfile: backend/Dockerfile
-    container_name: nest_auth
-    environment:
-      - DATABASE_URL=postgres://postgres:postgres@db:5432/cargo_db
-    depends_on:
-      - db
-    ports:
-      - "3001:3001"
-    networks:
-      - my_network
-
-  frontend:
-    build:
-      context: . # build in frontend folder
-      dockerfile: /frontend/Dockerfile
-    container_name: react_frontend
-    ports:
-      - "3030:3030" # host:container
-    depends_on:
-      - api
-      - db
-    networks:
-      - my_network
->>>>>>> d13cfe1cb49b7c0b711ca18eb76124183911a9a3
 
     db:
         image: postgres:15-alpine
