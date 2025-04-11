@@ -18,7 +18,7 @@ COPY package.json yarn.lock ./
 RUN yarn install --frozen-lockfile
 
 # ── Copy source and build ──
-COPY . .
+COPY ./frontend ./
 RUN yarn build                 # → /app/build
 
 ############################
@@ -32,8 +32,8 @@ FROM nginx:stable-alpine
 COPY --from=build /app/build /usr/share/nginx/html
 
 # Optional: custom Nginx config / entrypoint
-COPY nginx.conf /etc/nginx/conf.d/default.conf
-COPY docker-entrypoint.sh /docker-entrypoint.sh
+COPY frontend/nginx.conf /etc/nginx/conf.d/default.conf
+COPY frontend/docker-entrypoint.sh /docker-entrypoint.sh
 RUN chmod +x /docker-entrypoint.sh
 
 # Listen on 3030 instead of 80
