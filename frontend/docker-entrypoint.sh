@@ -50,7 +50,7 @@ echo "REACT_APP_BACKEND value: $REACT_APP_BACKEND"
 echo "REACT_APP_STAT_URL value: $REACT_APP_STAT_URL"
 
 if [ -n "$REACT_APP_BACKEND" ]; then
-  sed -i "s|http://localhost:3000|$REACT_APP_BACKEND|g" /usr/share/nginx/html/static/js/*.js
+  sed -i "s|http://localhost:3003|$REACT_APP_BACKEND|g" /usr/share/nginx/html/static/js/*.js
 else
   echo "REACT_APP_BACKEND environment variable not found."
 fi

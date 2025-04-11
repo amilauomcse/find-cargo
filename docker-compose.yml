@@ -33,7 +33,7 @@ services:
     build:
       context: . # build in frontend folder
       dockerfile: /frontend/Dockerfile
-    args:
+    environment:
       REACT_APP_BACKEND: "http://3.233.184.28:3003"
     container_name: react_frontend
     ports:
