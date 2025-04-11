@@ -8,14 +8,17 @@ RUN apk add --no-cache python3 make g++
 
 WORKDIR /app
 
+# Accept build argument
+ARG REACT_APP_BACKEND
+
+# Set environment variable so CRA can pick it up
+ENV REACT_APP_BACKEND=$REACT_APP_BACKEND
 # ── Copy dependency manifests and install ──
 COPY package.json yarn.lock ./
 RUN yarn install --frozen-lockfile
 
 # ── Copy source and build ──
 COPY . .
-ARG REACT_APP_BACKEND
-ENV REACT_APP_BACKEND $REACT_APP_BACKEND
 RUN yarn build                 # → /app/build
 
 ############################
