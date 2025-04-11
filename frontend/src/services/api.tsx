@@ -54,7 +54,7 @@ interface SalesCallData {
 // Add a new inquiry
 export const addInquiry = async (inquiryData: InquiryData) => {
   console.log("inquiry data: ", inquiryData);
-  console.log(process.env.REACT_APP_API_BASE_URL);
+  console.log(process.env.REACT_APP_BACKEND);
 
   try {
     const response = await api.post("/inquiries/add", inquiryData);

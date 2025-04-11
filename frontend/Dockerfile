@@ -14,11 +14,15 @@ RUN yarn install --frozen-lockfile
 
 # ── Copy source and build ──
 COPY . .
+ARG REACT_APP_BACKEND
+ENV REACT_APP_BACKEND $REACT_APP_BACKEND
 RUN yarn build                 # → /app/build
 
 ############################
 # 2. runtime stage
 ############################
+
+
 FROM nginx:stable-alpine
 
 # Copy built static files
