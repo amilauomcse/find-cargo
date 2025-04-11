@@ -1,6 +1,5 @@
 import React from "react";
 import axios from "axios";
-console.log(process.env.REACT_APP_API_BASE_URL);
 const api = axios.create({
   baseURL: process.env.REACT_APP_API_BASE_URL || "http://localhost:3003",
   timeout: 5000,
@@ -55,6 +54,8 @@ interface SalesCallData {
 // Add a new inquiry
 export const addInquiry = async (inquiryData: InquiryData) => {
   console.log("inquiry data: ", inquiryData);
+  console.log(process.env.REACT_APP_API_BASE_URL);
+
   try {
     const response = await api.post("/inquiries/add", inquiryData);
     return response.data;
