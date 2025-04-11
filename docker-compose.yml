@@ -1,66 +1,63 @@
-version: "3.8"
+version: '3.8'
 
 services:
-  api:
-    build:
-      context: .
-      dockerfile: backend/Dockerfile
-    container_name: nest_api
-    environment:
-      - DATABASE_URL=postgres://postgres:postgres@db:5432/cargo_db
-    depends_on:
-      - db
-    ports:
-      - "3000:3000"
-    networks:
-      - my_network
+    api:
+        build:
+            context: .
+            dockerfile: backend/Dockerfile
+        container_name: nest_api
+        environment:
+            - DATABASE_URL=postgres://postgres:postgres@db:5432/cargo_db
+        depends_on:
+            - db
+        ports:
+            - '3000:3000'
+        networks:
+            - my_network
 
-  auth:
-    build:
-      context: .
-      dockerfile: backend/Dockerfile
-    container_name: nest_auth
-    environment:
-      - DATABASE_URL=postgres://postgres:postgres@db:5432/cargo_db
-    depends_on:
-      - db
-    ports:
-      - "3001:3001"
-    networks:
-      - my_network
+    auth:
+        build:
+            context: .
+            dockerfile: backend/Dockerfile
+        container_name: nest_auth
+        environment:
+            - DATABASE_URL=postgres://postgres:postgres@db:5432/cargo_db
+        depends_on:
+            - db
+        ports:
+            - '3001:3001'
+        networks:
+            - my_network
 
-  frontend:
-    build:
-      context: . # build in frontend folder
-      dockerfile: /frontend/Dockerfile
-    environment:
-      REACT_APP_BACKEND: "http://3.233.184.28:3003"
-    container_name: react_frontend
-    ports:
-      - "3030:3030" # host:container
-    depends_on:
-      - api
-      - db
-    networks:
-      - my_network
+    frontend:
+        build:
+            context: .
+            dockerfile: frontend/Dockerfile
+        container_name: react_frontend
+        ports:
+            - '5173:5173'
+        depends_on:
+            - api
+        networks:
+            - my_network
 
-  db:
-    image: postgres:15-alpine
-    container_name: postgres_db
-    restart: always
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: cargo_db
-    ports:
-      - "5433:5432"
-    volumes:
-      - pg_data:/var/lib/postgresql/data
-    networks:
-      - my_network
+    db:
+        image: postgres:15-alpine
+        container_name: postgres_db
+        restart: always
+        environment:
+            POSTGRES_USER: postgres
+            POSTGRES_PASSWORD: postgres
+            POSTGRES_DB: cargo_db
+        ports:
+            - '5433:5432'
+        volumes:
+            - pg_data:/var/lib/postgresql/data
+        networks:
+            - my_network
 
 networks:
-  my_network:
+    my_network:
 
 volumes:
-  pg_data:
+    pg_data:
