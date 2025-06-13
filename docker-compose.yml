@@ -1,63 +1,76 @@
-version: '3.8'
+version: "3.8"
 
 services:
-    api:
-        build:
-            context: .
-            dockerfile: backend/Dockerfile
-        container_name: nest_api
-        environment:
-            - DATABASE_URL=postgres://postgres:postgres@db:5432/cargo_db
-        depends_on:
-            - db
-        ports:
-            - '3000:3000'
-        networks:
-            - my_network
+  api:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: cargo_backend
+    environment:
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DB_USERNAME=postgres
+      - DB_PASSWORD=postgres
+      - DB_NAME=cargo_db
+      - APP_ENV=dev
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "3003:3003"
+    networks:
+      - my_network
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "http://localhost:3003/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
 
-    auth:
-        build:
-            context: .
-            dockerfile: backend/Dockerfile
-        container_name: nest_auth
-        environment:
-            - DATABASE_URL=postgres://postgres:postgres@db:5432/cargo_db
-        depends_on:
-            - db
-        ports:
-            - '3001:3001'
-        networks:
-            - my_network
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: cargo_frontend
+    environment:
+      - VITE_API_URL=http://api:3003 # Use 'api' to reference the backend from Docker network
+      - HOST=0.0.0.0
+      - PORT=5173
+    ports:
+      - "5173:5173"
+    depends_on:
+      - api
+    networks:
+      - my_network
+    volumes:
+      - ./frontend:/app # Only mount source code for dev/live reload
+    stdin_open: true
+    tty: true
 
-    frontend:
-        build:
-            context: .
-            dockerfile: frontend/Dockerfile
-        container_name: react_frontend
-        ports:
-            - '5173:5173'
-        depends_on:
-            - api
-        networks:
-            - my_network
-
-    db:
-        image: postgres:15-alpine
-        container_name: postgres_db
-        restart: always
-        environment:
-            POSTGRES_USER: postgres
-            POSTGRES_PASSWORD: postgres
-            POSTGRES_DB: cargo_db
-        ports:
-            - '5433:5432'
-        volumes:
-            - pg_data:/var/lib/postgresql/data
-        networks:
-            - my_network
+  db:
+    image: postgres:15-alpine
+    container_name: postgres_db
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: cargo_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    networks:
+      - my_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
 
 networks:
-    my_network:
+  my_network:
+    driver: bridge
 
 volumes:
-    pg_data:
+  pg_data:

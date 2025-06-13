@@ -1,44 +1,39 @@
-############################
-# 1. build stage
-############################
-FROM node:20-alpine AS build
-
-# Install build tools once
-RUN apk add --no-cache python3 make g++
+FROM node:20-alpine as build
 
 WORKDIR /app
 
-# Accept build argument
-ARG REACT_APP_BACKEND
+# Install build dependencies
+RUN apk add --no-cache python3 make g++
 
-# Set environment variable so CRA can pick it up
-ENV REACT_APP_BACKEND=$REACT_APP_BACKEND
-# ── Copy dependency manifests and install ──
+# Copy package files
 COPY package.json yarn.lock ./
-RUN yarn install --frozen-lockfile
 
-# ── Copy source and build ──
+# Install dependencies
+RUN yarn install
+
+# Copy source
 COPY . .
-RUN yarn build                 # → /app/build
 
-############################
-# 2. runtime stage
-############################
+# Build the application
+RUN yarn build
 
+# Production stage
+FROM node:20-alpine as production
 
-FROM nginx:stable-alpine
+WORKDIR /app
 
-# Copy built static files
-COPY --from=build /app/build /usr/share/nginx/html
+# Install serve to run the built application
+RUN yarn global add serve
 
-# Optional: custom Nginx config / entrypoint
-COPY nginx.conf /etc/nginx/conf.d/default.conf
-COPY docker-entrypoint.sh /docker-entrypoint.sh
-RUN chmod +x /docker-entrypoint.sh
+# Copy built files from build stage
+COPY --from=build /app/dist ./dist
 
-# Listen on 3030 instead of 80
-ENV NGINX_PORT=3030
-RUN sed -i "s/listen\s\+80;/listen ${NGINX_PORT};/g" /etc/nginx/conf.d/default.conf
+# Expose the port
+EXPOSE 5173
 
-EXPOSE 3030
-CMD ["nginx", "-g", "daemon off;"]
+# Set environment variables
+ENV HOST=0.0.0.0
+ENV PORT=5173
+
+# Start the application
+CMD ["serve", "-s", "dist", "-l", "5173"]
