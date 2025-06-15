@@ -4,13 +4,13 @@ FROM node:20-alpine
 WORKDIR /usr/src/app
 
 # Copy package files
-COPY backend/package.json backend/yarn.lock ./
+COPY package.json yarn.lock ./
 
 # Install dependencies
 RUN yarn install --frozen-lockfile
 
 # Copy the application source code
-COPY backend/ ./
+COPY . .
 
 # Build the application
 RUN yarn build
