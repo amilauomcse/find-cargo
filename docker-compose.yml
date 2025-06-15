@@ -33,7 +33,7 @@ services:
       dockerfile: Dockerfile
     container_name: cargo_frontend
     environment:
-      - VITE_API_URL=http://api:3003 # Use 'api' to reference the backend from Docker network
+      - VITE_BACKEND_URL=http://api:3003 # Use 'api' to reference the backend from Docker network
       - HOST=0.0.0.0
       - PORT=5173
     ports:
