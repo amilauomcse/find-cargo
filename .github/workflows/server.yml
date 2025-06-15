@@ -69,6 +69,7 @@ jobs:
           key:      ${{ secrets.EC2_SSH_KEY }}
           script: |
             my-cargo/deploy.sh backend ${{ env.IMAGE_TAG }}
+            
 
 # ─────────────────────────────────────────────────────────────
 # 3)  Build & deploy FRONTEND  (runs only if frontend==true)
@@ -111,4 +112,5 @@ jobs:
           key:      ${{ secrets.EC2_SSH_KEY }}
           script: |
             my-cargo/deploy.sh frontend ${{ env.IMAGE_TAG }}
+
             
