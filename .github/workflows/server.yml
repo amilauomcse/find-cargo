@@ -68,7 +68,7 @@ jobs:
           username: ec2-user
           key:      ${{ secrets.EC2_SSH_KEY }}
           script: |
-            my-cargo/deploy.sh backend ${{ env.IMAGE_TAG }}
+            my-cargo/backend_deploy.sh backend ${{ env.IMAGE_TAG }}
             
 
 # ─────────────────────────────────────────────────────────────
@@ -111,6 +111,6 @@ jobs:
           username: ec2-user
           key:      ${{ secrets.EC2_SSH_KEY }}
           script: |
-            my-cargo/deploy.sh frontend ${{ env.IMAGE_TAG }}
+            my-cargo/frontend_deploy.sh frontend ${{ env.IMAGE_TAG }}
 
             
