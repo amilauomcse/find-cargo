@@ -13,7 +13,8 @@ RUN yarn install
 
 # Copy source
 COPY . .
-
+ARG REACT_APP_BACKEND
+ENV REACT_APP_BACKEND $REACT_APP_BACKEND
 # Build the application
 RUN yarn build
 
