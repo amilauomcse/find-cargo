@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import "./Dashboard.css";
-import axios from "axios";
+import { getInquiries } from "../services/api";
 
 interface Inquiry {
   id: number;
@@ -33,7 +33,7 @@ const InquiriesDashboard: React.FC = () => {
   useEffect(() => {
     const fetchInquiries = async () => {
       try {
-        const response = await axios.get("/api/inquiries");
+        const response = await getInquiries();
         setInquiries(response.data);
         setFilteredInquiries(response.data);
         setError(null);
