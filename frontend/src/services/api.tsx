@@ -1,6 +1,6 @@
 import axios from "axios";
 const api = axios.create({
-  baseURL: process.env.REACT_APP_BACKEND ?? "localhost:3003",
+  baseURL: import.meta.env.VITE_BACKEND_URL ?? "localhost:3003",
   timeout: 5000,
   headers: {
     "Content-Type": "application/json",
@@ -53,7 +53,7 @@ interface SalesCallData {
 // Add a new inquiry
 export const addInquiry = async (inquiryData: InquiryData) => {
   console.log("inquiry data: ", inquiryData);
-  console.log(process.env.REACT_APP_BACKEND);
+  console.log(import.meta.env.VITE_BACKEND_URL);
 
   try {
     const response = await api.post("/inquiries/add", inquiryData);
