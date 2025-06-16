@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import "./Dashboard.css";
-import axios from "axios";
+import { getSalesCalls } from "../services/api";
 
 interface SalesCall {
   id: number;
@@ -28,9 +28,9 @@ const SalesCallsDashboard: React.FC = () => {
   useEffect(() => {
     const fetchSalesCalls = async () => {
       try {
-        const response = await axios.get("/api/sales-calls");
-        setSalesCalls(response.data);
-        setFilteredSalesCalls(response.data);
+        const response = await getSalesCalls();
+        setSalesCalls(response);
+        setFilteredSalesCalls(response);
         setError(null);
       } catch (err) {
         setError("Failed to fetch sales calls");
@@ -124,8 +124,8 @@ const SalesCallsDashboard: React.FC = () => {
             </tr>
           </thead>
           <tbody>
-            {filteredSalesCalls.length > 0 ? (
-              filteredSalesCalls.map((call) => (
+            {filteredSalesCalls?.length > 0 ? (
+              filteredSalesCalls?.map((call) => (
                 <tr key={call.id}>
                   <td>{call.companyName}</td>
                   <td>{call.contactedEmployee}</td>

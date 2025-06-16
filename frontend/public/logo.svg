@@ -1,0 +1,14 @@
+<svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Container Box -->
+  <rect x="5" y="15" width="30" height="20" rx="2" fill="#2563EB" stroke="#1E40AF" stroke-width="2"/>
+  
+  <!-- Container Lines -->
+  <line x1="10" y1="20" x2="30" y2="20" stroke="#1E40AF" stroke-width="2"/>
+  <line x1="10" y1="25" x2="30" y2="25" stroke="#1E40AF" stroke-width="2"/>
+  
+  <!-- Ship -->
+  <path d="M8 15 L32 15 L30 10 L10 10 Z" fill="#1E40AF"/>
+  
+  <!-- Waves -->
+  <path d="M5 35 Q10 33 15 35 Q20 37 25 35 Q30 33 35 35" stroke="#2563EB" stroke-width="2" fill="none"/>
+</svg> 

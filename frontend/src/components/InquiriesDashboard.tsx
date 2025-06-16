@@ -38,8 +38,8 @@ const InquiriesDashboard: React.FC = () => {
         console.log("About to call getInquiries");
         const response = await getInquiries();
         console.log("Received response:", response);
-        setInquiries(response.data);
-        setFilteredInquiries(response.data);
+        setInquiries(response);
+        setFilteredInquiries(response);
         setError(null);
       } catch (err) {
         console.error("Error in fetchInquiries:", err);
@@ -134,7 +134,7 @@ const InquiriesDashboard: React.FC = () => {
             </tr>
           </thead>
           <tbody>
-            {filteredInquiries.length > 0 ? (
+            {filteredInquiries?.length > 0 ? (
               filteredInquiries.map((inquiry) => (
                 <tr key={inquiry.id}>
                   <td>{inquiry.type}</td>

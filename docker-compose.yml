@@ -17,11 +17,11 @@ services:
       db:
         condition: service_healthy
     ports:
-      - "3003:3003"
+      - "3000:3000"
     networks:
       - my_network
     healthcheck:
-      test: ["CMD", "wget", "--spider", "http://localhost:3003/health"]
+      test: ["CMD", "wget", "--spider", "http://localhost:3000/health"]
       interval: 10s
       timeout: 5s
       retries: 3
@@ -33,7 +33,7 @@ services:
       dockerfile: Dockerfile
     container_name: cargo_frontend
     environment:
-      - VITE_BACKEND_URL=http://api:3003 # Use 'api' to reference the backend from Docker network
+      - VITE_BACKEND_URL=http://api:3000 # Use 'api' to reference the backend from Docker network
       - HOST=0.0.0.0
       - PORT=5173
     ports:

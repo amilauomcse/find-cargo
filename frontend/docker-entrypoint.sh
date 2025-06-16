@@ -48,7 +48,7 @@ VITE_BACKEND_URL=$(env | grep VITE_BACKEND_URL= | cut -d'=' -f2-)
 echo "VITE_BACKEND_URL value: $VITE_BACKEND_URL"
 
 if [ -n "$VITE_BACKEND_URL" ]; then
-  sed -i "s|http://localhost:3003|$VITE_BACKEND_URL|g" /usr/share/nginx/html/static/js/*.js
+  sed -i "s|http://localhost:3000|$VITE_BACKEND_URL|g" /usr/share/nginx/html/static/js/*.js
 else
   echo "VITE_BACKEND_URL environment variable not found."
 fi

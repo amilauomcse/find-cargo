@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import "./Dashboard.css"; // We'll define modern styles in this CSS file
-import axios from "axios";
+import { getRates } from "../services/api";
 
 interface Rate {
   id: number;
@@ -38,9 +38,9 @@ const RatesDashboard: React.FC = () => {
   useEffect(() => {
     const fetchRates = async () => {
       try {
-        const response = await axios.get("/api/rates");
-        setRates(response.data);
-        setFilteredRates(response.data);
+        const response = await getRates();
+        setRates(response);
+        setFilteredRates(response);
         setError(null);
       } catch (err) {
         setError("Failed to fetch rates");
@@ -167,8 +167,8 @@ const RatesDashboard: React.FC = () => {
             </tr>
           </thead>
           <tbody>
-            {filteredRates.length > 0 ? (
-              filteredRates.map((rate) => (
+            {filteredRates?.length > 0 ? (
+              filteredRates?.map((rate) => (
                 <tr key={rate.id}>
                   <td>{rate.agentName}</td>
                   <td>{rate.etd}</td>
