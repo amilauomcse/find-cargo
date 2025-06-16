@@ -20,6 +20,7 @@ interface Inquiry {
 }
 
 const InquiriesDashboard: React.FC = () => {
+  console.log("InquiriesDashboard component mounted");
   const [inquiries, setInquiries] = useState<Inquiry[]>([]);
   const [filteredInquiries, setFilteredInquiries] = useState<Inquiry[]>(inquiries);
   const [loading, setLoading] = useState<boolean>(true);
@@ -32,12 +33,16 @@ const InquiriesDashboard: React.FC = () => {
   //fetch inquiries from API
   useEffect(() => {
     const fetchInquiries = async () => {
+      console.log("Starting fetchInquiries");
       try {
+        console.log("About to call getInquiries");
         const response = await getInquiries();
+        console.log("Received response:", response);
         setInquiries(response.data);
         setFilteredInquiries(response.data);
         setError(null);
       } catch (err) {
+        console.error("Error in fetchInquiries:", err);
         setError("Failed to fetch inquiries");
       } finally {
         setLoading(false);

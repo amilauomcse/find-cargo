@@ -1,36 +1,97 @@
-.dashboard-container {
+/* Import modern fonts */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+/* Reset and base styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: #f8f9fa;
+  color: #1a1a1a;
+}
+
+/* App Container */
+.app-container {
   display: flex;
+  flex-direction: column;
   min-height: 100vh;
 }
 
-.sidebar {
-  width: 240px;
-  background-color: #1c1c1c;
-  color: #ffffff;
+/* Header Styles */
+.app-header {
+  background-color: #ffffff;
+  padding: 1rem 2rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
   display: flex;
-  flex-direction: column;
-  padding: 1rem;
+  justify-content: space-between;
+  align-items: center;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
 }
 
-.logo-section {
+.header-left {
   display: flex;
   align-items: center;
-  margin-bottom: 2rem;
+  gap: 1rem;
 }
 
-.logo-img {
+.header-logo {
   width: 40px;
   height: 40px;
-  margin-right: 0.5rem;
 }
 
-.logo-text {
-  font-size: 1.2rem;
+.header-left h1 {
+  font-size: 1.5rem;
   font-weight: 600;
+  color: #1a1a1a;
 }
 
-.menu {
+.header-right {
+  display: flex;
+  gap: 1rem;
+}
+
+.header-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border: none;
+  background: none;
+  color: #4a5568;
+  font-size: 0.9rem;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+.header-btn:hover {
+  background-color: #f3f4f6;
+  color: #1a1a1a;
+}
+
+/* Main Container */
+.main-container {
+  display: flex;
   flex: 1;
+}
+
+/* Sidebar Styles */
+.sidebar {
+  width: 260px;
+  background-color: #ffffff;
+  border-right: 1px solid #e5e7eb;
+  padding: 1.5rem 1rem;
+  height: calc(100vh - 64px);
+  position: sticky;
+  top: 64px;
 }
 
 .menu ul {
@@ -43,30 +104,100 @@
   display: flex;
   align-items: center;
   padding: 0.75rem 1rem;
-  color: #ffffff;
+  color: #4a5568;
   text-decoration: none;
-  border-radius: 4px;
-  transition: background-color 0.3s ease;
+  border-radius: 8px;
+  margin-bottom: 0.5rem;
+  transition: all 0.2s ease;
+  font-weight: 500;
 }
 
 .menu-link:hover {
-  background-color: #333333;
+  background-color: #f3f4f6;
+  color: #1a1a1a;
+}
+
+.menu-link.active {
+  background-color: #e5e7eb;
+  color: #1a1a1a;
 }
 
 .icon {
-  margin-right: 0.5rem;
+  margin-right: 0.75rem;
+  color: #6b7280;
 }
 
+/* Main Content */
 .main-content {
   flex: 1;
-  background-color: #f0f0f0;
-  padding: 1rem;
+  padding: 2rem;
+  background-color: #f8f9fa;
+  min-height: calc(100vh - 64px - 60px);
 }
 
-/* Example of adding custom fonts or additional styling (optional) */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap');
+/* Footer Styles */
+.app-footer {
+  background-color: #ffffff;
+  padding: 1rem 2rem;
+  border-top: 1px solid #e5e7eb;
+}
 
-body {
-  margin: 0;
-  font-family: 'Inter', sans-serif;
+.footer-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.footer-content p {
+  color: #6b7280;
+  font-size: 0.9rem;
+}
+
+.footer-links {
+  display: flex;
+  gap: 1.5rem;
+}
+
+.footer-links a {
+  color: #6b7280;
+  text-decoration: none;
+  font-size: 0.9rem;
+  transition: color 0.2s ease;
+}
+
+.footer-links a:hover {
+  color: #1a1a1a;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .sidebar {
+    width: 220px;
+  }
+}
+
+@media (max-width: 768px) {
+  .main-container {
+    flex-direction: column;
+  }
+
+  .sidebar {
+    width: 100%;
+    height: auto;
+    position: static;
+    border-right: none;
+    border-bottom: 1px solid #e5e7eb;
+  }
+
+  .header-right span {
+    display: none;
+  }
+
+  .footer-content {
+    flex-direction: column;
+    gap: 1rem;
+    text-align: center;
+  }
 }

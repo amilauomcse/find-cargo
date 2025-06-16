@@ -1,116 +1,196 @@
 /* --------------- Dashboard.css ---------------*/
 
+/* Dashboard Page Styles */
 .dashboard-page {
-	background-color: #f0f0f0;
-	padding: 1rem;
-	border-radius: 8px;
+	background-color: #ffffff;
+	padding: 2rem;
+	border-radius: 12px;
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
+/* Page Header */
 .page-header {
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
-	margin-bottom: 1.5rem;
+	margin-bottom: 2rem;
+	padding-bottom: 1rem;
+	border-bottom: 1px solid #e5e7eb;
 }
 
 .page-header h2 {
-	font-size: 1.5rem;
+	font-size: 1.75rem;
+	font-weight: 600;
+	color: #1a1a1a;
 	margin: 0;
 }
 
+/* Buttons */
 .primary-btn {
-	background-color: #007bff;
-	color: #fff;
+	background-color: #2563eb;
+	color: #ffffff;
 	border: none;
-	padding: 0.75rem 1rem;
-	border-radius: 4px;
+	padding: 0.75rem 1.5rem;
+	border-radius: 8px;
 	cursor: pointer;
-	font-size: 0.9rem;
-	transition: background-color 0.3s ease;
+	font-size: 0.95rem;
+	font-weight: 500;
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	transition: all 0.2s ease;
 }
 
 .primary-btn:hover {
-	background-color: #0056b3;
+	background-color: #1d4ed8;
+	transform: translateY(-1px);
 }
 
+/* Search and Filter Bar */
 .search-filter-bar {
 	display: flex;
 	flex-wrap: wrap;
-	gap: 1rem;
-	margin-bottom: 1.5rem;
+	gap: 1.5rem;
+	margin-bottom: 2rem;
+	padding: 1.5rem;
+	background-color: #f8fafc;
+	border-radius: 8px;
+	border: 1px solid #e5e7eb;
 }
 
 .filter-group {
 	display: flex;
 	flex-direction: column;
+	gap: 0.5rem;
+	min-width: 200px;
 }
 
 .filter-group label {
-	margin-bottom: 0.25rem;
+	font-size: 0.9rem;
 	font-weight: 500;
+	color: #4b5563;
+}
+
+.filter-group input,
+.filter-group select {
+	padding: 0.75rem;
+	border: 1px solid #e5e7eb;
+	border-radius: 6px;
+	font-size: 0.95rem;
+	color: #1a1a1a;
+	background-color: #ffffff;
+	transition: all 0.2s ease;
+}
+
+.filter-group input:focus,
+.filter-group select:focus {
+	outline: none;
+	border-color: #2563eb;
+	box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+/* Filter Buttons */
+.apply-filters-btn,
+.clear-filters-btn {
+	align-self: flex-end;
+	padding: 0.75rem 1.5rem;
+	border: none;
+	border-radius: 8px;
+	cursor: pointer;
+	font-size: 0.95rem;
+	font-weight: 500;
+	transition: all 0.2s ease;
 }
 
 .apply-filters-btn {
-	align-self: flex-end;
-	background-color: #28a745;
-	color: #fff;
-	border: none;
-	padding: 0.75rem 1rem;
-	border-radius: 4px;
-	cursor: pointer;
-	font-size: 0.9rem;
-	transition: background-color 0.3s ease;
-}
-
-.clear-filters-btn {
-	align-self: flex-end;
-	background-color: #bb4242;
-	color: #fff;
-	border: none;
-	padding: 0.75rem 1rem;
-	border-radius: 4px;
-	cursor: pointer;
-	font-size: 0.9rem;
-	transition: background-color 0.3s ease;
+	background-color: #059669;
+	color: #ffffff;
 }
 
 .apply-filters-btn:hover {
-	background-color: #1e7e34;
+	background-color: #047857;
+	transform: translateY(-1px);
+}
+
+.clear-filters-btn {
+	background-color: #dc2626;
+	color: #ffffff;
 }
 
 .clear-filters-btn:hover {
-	background-color: #822c2c;
+	background-color: #b91c1c;
+	transform: translateY(-1px);
 }
 
+/* Table Card */
 .table-card {
-	background-color: #fff;
-	padding: 1rem;
-	border-radius: 6px;
+	background-color: #ffffff;
+	padding: 1.5rem;
+	border-radius: 12px;
 	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .table-card h3 {
-	margin-top: 0;
-	font-size: 1.1rem;
-	margin-bottom: 1rem;
+	margin: 0 0 1.5rem 0;
+	font-size: 1.25rem;
+	font-weight: 600;
+	color: #1a1a1a;
 }
 
+/* Data Table */
 .data-table {
 	width: 100%;
-	border-collapse: collapse;
+	border-collapse: separate;
+	border-spacing: 0;
 }
 
 .data-table th,
 .data-table td {
+	padding: 1rem;
 	text-align: left;
-	padding: 0.75rem;
-	border-bottom: 1px solid #ececec;
+	border-bottom: 1px solid #e5e7eb;
 }
 
 .data-table th {
-	background-color: #fafafa;
+	background-color: #f8fafc;
+	font-weight: 600;
+	color: #4b5563;
+	font-size: 0.95rem;
 }
 
-.data-table tr:hover {
-	background-color: #f9f9f9;
+.data-table td {
+	color: #1a1a1a;
+	font-size: 0.95rem;
+}
+
+.data-table tr:last-child td {
+	border-bottom: none;
+}
+
+.data-table tr:hover td {
+	background-color: #f8fafc;
+}
+
+/* Responsive Table */
+@media (max-width: 1024px) {
+	.data-table {
+		display: block;
+		overflow-x: auto;
+		white-space: nowrap;
+	}
+}
+
+/* Loading and Error States */
+.loading-state,
+.error-state {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	min-height: 200px;
+	font-size: 1.1rem;
+	color: #4b5563;
+}
+
+.error-state {
+	color: #dc2626;
 }

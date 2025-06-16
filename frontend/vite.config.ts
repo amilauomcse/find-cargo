@@ -18,4 +18,10 @@ export default defineConfig({
   optimizeDeps: {
     include: ["react", "react-dom"],
   },
+  base: "/",
+  build: {
+    outDir: "dist",
+    assetsDir: "assets",
+    sourcemap: true,
+  },
 });
