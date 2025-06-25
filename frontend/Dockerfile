@@ -13,8 +13,7 @@ RUN yarn install
 
 # Copy source
 COPY . .
-ARG VITE_BACKEND_URL
-ENV VITE_BACKEND_URL $VITE_BACKEND_URL
+
 # Build the application
 RUN yarn build
 
@@ -36,5 +35,5 @@ EXPOSE 5173
 ENV HOST=0.0.0.0
 ENV PORT=5173
 
-# Start the application
-CMD ["serve", "-s", "dist", "-l", "5173"]
+# Start the application with inline script
+CMD sh -c 'echo "Starting frontend with backend URL: $VITE_BACKEND_URL" && if [ -n "$VITE_BACKEND_URL" ]; then echo "Injecting backend URL..." && find /app/dist -name "*.js" -exec sed -i "s|http://api:3000|$VITE_BACKEND_URL|g" {} \; && find /app/dist -name "*.js" -exec sed -i "s|http://localhost:3000|$VITE_BACKEND_URL|g" {} \; && echo "Backend URL injection complete"; fi && serve -s dist -l 5173'
