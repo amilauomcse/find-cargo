@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import { useAuth } from "../contexts/AuthContext";
 import { api, updateProfile } from "../services/api";
 import {
   User,
@@ -33,7 +32,6 @@ interface UserProfileData {
 }
 
 const UserProfile: React.FC = () => {
-  const { user } = useAuth();
   const [profileData, setProfileData] = useState<UserProfileData | null>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [isLoading, setIsLoading] = useState(true);

@@ -103,21 +103,6 @@ const AuditDashboard: React.FC = () => {
     }
   };
 
-  const handleFilterChange = () => {
-    const newFilteredLogs = auditLogs.filter((log) => {
-      const matchesSearch = searchFilter
-        ? log.description.toLowerCase().includes(searchFilter.toLowerCase()) ||
-          log.user?.firstName.toLowerCase().includes(searchFilter.toLowerCase()) ||
-          log.user?.lastName.toLowerCase().includes(searchFilter.toLowerCase()) ||
-          log.user?.email.toLowerCase().includes(searchFilter.toLowerCase())
-        : true;
-
-      return matchesSearch;
-    });
-
-    setFilteredLogs(newFilteredLogs);
-  };
-
   const clearFilters = () => {
     setActionFilter("");
     setResourceTypeFilter("");
