@@ -1,13 +1,11 @@
-import { Module } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { RateEntity } from './entities/rate.entity';
-import { RateController } from 'apps/api/src/rate/rate.controller';
-import { RateService } from 'apps/api/src/rate/rate.service';
+import { Module } from "@nestjs/common";
+import { TypeOrmModule } from "@nestjs/typeorm";
+import { RateEntity } from "./entities/rate.entity";
+import { AuditModule } from "../audit/audit.module";
 
 @Module({
-	imports: [TypeOrmModule.forFeature([RateEntity])],
-	controllers: [RateController],
-	providers: [RateService],
-	exports: [RateService],
+  imports: [TypeOrmModule.forFeature([RateEntity]), AuditModule],
+  providers: [],
+  exports: [AuditModule],
 })
 export class RatesModule {}

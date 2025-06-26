@@ -1,52 +1,73 @@
-import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  ManyToOne,
+  JoinColumn,
+  CreateDateColumn,
+  UpdateDateColumn,
+} from "typeorm";
 
-@Entity({ name: 'inquiry_entity' })
+@Entity({ name: "inquiry_entity" })
 export class InquiryEntity {
-	@PrimaryGeneratedColumn()
-	id: number;
+  @PrimaryGeneratedColumn()
+  id: number;
 
-	// @Column()
-	// agentName: string;
+  // @Column()
+  // agentName: string;
 
-	@Column()
-	type: string;
+  @Column()
+  type: string;
 
-	@Column()
-	method: string;
+  @Column()
+  method: string;
 
-	@Column()
-	portOfLoading: string;
+  @Column()
+  portOfLoading: string;
 
-	@Column()
-	portOfDischarge: string;
+  @Column()
+  portOfDischarge: string;
 
-	@Column({ type: 'date', nullable: true })
-	createdDate: Date;
+  @Column({ type: "date", nullable: true })
+  createdDate: Date;
 
-	@Column()
-	offeredRate: number;
+  @Column()
+  offeredRate: number;
 
-	@Column()
-	clientName: string;
+  @Column()
+  clientName: string;
 
-	@Column()
-	clientContactNo: string;
+  @Column()
+  clientContactNo: string;
 
-	@Column()
-	clientContactEmail: string;
+  @Column()
+  clientContactEmail: string;
 
-	@Column()
-	feedback: string;
+  @Column()
+  feedback: string;
 
-	@Column()
-	status: string;
+  @Column()
+  status: string;
 
-	@Column()
-	addedBy: string;
+  @Column()
+  addedBy: string;
 
-	// @Column({ type: 'date' })
-	// etd: string;
+  // @Column({ type: 'date' })
+  // etd: string;
 
-	// @Column({ type: 'date', nullable: true })
-	// followUpDate: string;
+  // @Column({ type: 'date', nullable: true })
+  // followUpDate: string;
+
+  // Add organization support
+  @Column({ nullable: true })
+  organizationId: number;
+
+  @Column({ nullable: true })
+  createdById: number;
+
+  @CreateDateColumn()
+  createdAt: Date;
+
+  @UpdateDateColumn()
+  updatedAt: Date;
 }

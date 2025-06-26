@@ -1,0 +1,25 @@
+// List of common ports for dropdowns
+export const PORTS = [
+  "Colombo",
+  "Shanghai",
+  "Singapore",
+  "Rotterdam",
+  "Hamburg",
+  "Los Angeles",
+  "New York",
+  "Dubai",
+  "Antwerp",
+  "Hong Kong",
+  "Busan",
+  "Felixstowe",
+  "Long Beach",
+  "Tanjung Pelepas",
+  "Port Klang",
+  "Jebel Ali",
+  "Gioia Tauro",
+  "Valencia",
+  "Barcelona",
+  "Sydney",
+  "Melbourne",
+  // Add more as needed
+];

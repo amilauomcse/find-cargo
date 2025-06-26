@@ -18,6 +18,11 @@ export class SalesCallsController {
     return this.salesCallsService.getAllSalesCalls();
   }
 
+  @Get('stats')
+  async getStats() {
+    return this.salesCallsService.getStats();
+  }
+
   @Get(':id')
   findOne(@Param('id') id: number) {
     return this.salesCallsService.findOne(id);

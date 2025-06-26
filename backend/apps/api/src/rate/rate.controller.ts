@@ -18,6 +18,11 @@ export class RateController {
     return this.rateService.getAllRates();
   }
 
+  @Get('stats')
+  async getStats() {
+    return this.rateService.getStats();
+  }
+
   @Get(':id')
   findOne(@Param('id') id: number) {
     return this.rateService.findOne(id);

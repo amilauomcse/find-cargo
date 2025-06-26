@@ -1,7 +1,9 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, MoreThanOrEqual } from 'typeorm';
 import { RateEntity } from '../../../../libs/shared/src/rates/entities/rate.entity';
+import { AuditService } from '../audit/audit.service';
+import { AuditAction } from '../../../../libs/shared/src/audit/entities/audit-log.entity';
 
 @Injectable()
 export class RateService {
@@ -10,9 +12,15 @@ export class RateService {
   constructor(
     @InjectRepository(RateEntity)
     private rateRepository: Repository<RateEntity>,
+    private auditService: AuditService,
   ) {}
 
-  async createRate(rateData: Partial<RateEntity>): Promise<RateEntity> {
+  async createRate(
+    rateData: Partial<RateEntity>,
+    userId?: number,
+    organizationId?: number,
+    request?: any,
+  ): Promise<RateEntity> {
     try {
       this.logger.log(
         `Creating new rate with data: ${JSON.stringify(rateData)}`,
@@ -20,6 +28,24 @@ export class RateService {
       const newRate = this.rateRepository.create(rateData);
       const rate = await this.rateRepository.save(newRate);
       this.logger.log(`Successfully created rate with ID: ${rate.id}`);
+
+      // Log the audit event if user and organization are provided
+      if (userId && organizationId) {
+        await this.auditService.logRateAction(
+          AuditAction.RATE_CREATED,
+          `Rate created: ${rate.loadingPort} to ${rate.dischargePort}`,
+          userId,
+          organizationId,
+          rate.id,
+          {
+            rateId: rate.id,
+            loadingPort: rate.loadingPort,
+            dischargePort: rate.dischargePort,
+          },
+          request,
+        );
+      }
+
       return rate;
     } catch (error) {
       this.logger.error(`Failed to create rate: ${error.message}`, error.stack);
@@ -61,12 +87,34 @@ export class RateService {
   async updateRate(
     id: number,
     rateData: Partial<RateEntity>,
+    userId?: number,
+    organizationId?: number,
+    request?: any,
   ): Promise<RateEntity> {
     try {
       this.logger.log(`Updating rate with ID: ${id}`);
       await this.rateRepository.update(id, rateData);
       const rate = await this.rateRepository.findOneBy({ id });
       this.logger.log(`Successfully updated rate with ID: ${id}`);
+
+      // Log the audit event if user and organization are provided
+      if (userId && organizationId) {
+        await this.auditService.logRateAction(
+          AuditAction.RATE_UPDATED,
+          `Rate updated: ${rate.loadingPort} to ${rate.dischargePort}`,
+          userId,
+          organizationId,
+          rate.id,
+          {
+            rateId: rate.id,
+            loadingPort: rate.loadingPort,
+            dischargePort: rate.dischargePort,
+            changes: rateData,
+          },
+          request,
+        );
+      }
+
       return rate;
     } catch (error) {
       this.logger.error(
@@ -77,7 +125,12 @@ export class RateService {
     }
   }
 
-  async deleteRate(id: number): Promise<RateEntity> {
+  async deleteRate(
+    id: number,
+    userId?: number,
+    organizationId?: number,
+    request?: any,
+  ): Promise<RateEntity> {
     try {
       this.logger.log(`Deleting rate with ID: ${id}`);
       const rate = await this.rateRepository.findOneBy({ id });
@@ -87,10 +140,57 @@ export class RateService {
       }
       await this.rateRepository.delete(id);
       this.logger.log(`Successfully deleted rate with ID: ${id}`);
+
+      // Log the audit event if user and organization are provided
+      if (userId && organizationId) {
+        await this.auditService.logRateAction(
+          AuditAction.RATE_DELETED,
+          `Rate deleted: ${rate.loadingPort} to ${rate.dischargePort}`,
+          userId,
+          organizationId,
+          rate.id,
+          {
+            rateId: rate.id,
+            loadingPort: rate.loadingPort,
+            dischargePort: rate.dischargePort,
+          },
+          request,
+        );
+      }
+
       return rate;
     } catch (error) {
       this.logger.error(
         `Failed to delete rate with ID ${id}: ${error.message}`,
+        error.stack,
+      );
+      throw error;
+    }
+  }
+
+  async getStats() {
+    try {
+      this.logger.log('Fetching rate statistics');
+      const total = await this.rateRepository.count();
+
+      // Get recent rates (last 7 days)
+      const sevenDaysAgo = new Date();
+      sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+
+      const recent = await this.rateRepository.count({
+        where: {
+          createdAt: MoreThanOrEqual(sevenDaysAgo),
+        },
+      });
+
+      this.logger.log(`Rate stats - Total: ${total}, Recent: ${recent}`);
+      return {
+        total,
+        recent,
+      };
+    } catch (error) {
+      this.logger.error(
+        `Failed to fetch rate stats: ${error.message}`,
         error.stack,
       );
       throw error;

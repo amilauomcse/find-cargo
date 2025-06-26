@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import "./Dashboard.css";
+import { PlusCircle, Search, Filter, X } from "lucide-react";
 import { getInquiries } from "../services/api";
 
 interface Inquiry {
@@ -20,24 +20,17 @@ interface Inquiry {
 }
 
 const InquiriesDashboard: React.FC = () => {
-  console.log("InquiriesDashboard component mounted");
   const [inquiries, setInquiries] = useState<Inquiry[]>([]);
-  const [filteredInquiries, setFilteredInquiries] = useState<Inquiry[]>(inquiries);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [filteredInquiries, setFilteredInquiries] = useState<Inquiry[]>([]);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
-  // Filter states
   const [addedByFilter, setAddedByFilter] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
 
-  //fetch inquiries from API
   useEffect(() => {
     const fetchInquiries = async () => {
-      console.log("Starting fetchInquiries");
       try {
-        console.log("About to call getInquiries");
         const response = await getInquiries();
-        console.log("Received response:", response);
         setInquiries(response);
         setFilteredInquiries(response);
         setError(null);
@@ -51,16 +44,7 @@ const InquiriesDashboard: React.FC = () => {
     fetchInquiries();
   }, []);
 
-  if (loading) return <div>Loading...</div>;
-  if (error) return <div>Error: {error}</div>;
-
   const handleFilterChange = () => {
-    // Implement filtering or API calls here
-    console.log("Filters applied:", {
-      addedBy: addedByFilter,
-      status: statusFilter,
-    });
-
     const newFilteredInquiries = inquiries.filter(
       (inquiry) =>
         (addedByFilter
@@ -76,88 +60,229 @@ const InquiriesDashboard: React.FC = () => {
     setFilteredInquiries(inquiries);
   };
 
+  if (loading) {
+    return (
+      <div className="loading-container">
+        <div className="loading-spinner"></div>
+        <p>Loading inquiries...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return <div className="error-state">Error: {error}</div>;
+  }
+
   return (
-    <div className="dashboard-page">
+    <div style={{ maxWidth: "1400px", margin: "0 auto", padding: "1rem" }}>
       {/* Page Header */}
-      <div className="page-header">
-        <h2>Inquiries Dashboard</h2>
-        <Link to="/inquiries/add">
-          <button className="primary-btn">Add Inquiry</button>
+      <div
+        className="card"
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          marginBottom: "1rem",
+          padding: "1.5rem",
+        }}
+      >
+        <div>
+          <h1 style={{ margin: "0 0 0.5rem 0", color: "var(--color-primary)" }}>
+            Inquiries Dashboard
+          </h1>
+          <p style={{ margin: 0, color: "var(--color-text-light)" }}>
+            Manage and track customer inquiries ({filteredInquiries.length} total)
+          </p>
+        </div>
+        <Link
+          to="/inquiries/add"
+          className="btn-primary"
+          style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}
+        >
+          <PlusCircle size={20} />
+          Add Inquiry
         </Link>
       </div>
 
       {/* Filters Section */}
-      <div className="search-filter-bar">
-        <div className="filter-group">
-          <label>Added By:</label>
-          <input
-            type="text"
-            value={addedByFilter}
-            onChange={(e) => setAddedByFilter(e.target.value)}
-            placeholder="Enter name"
-          />
+      <div className="card" style={{ marginBottom: "1rem", padding: "1.5rem" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "1rem", marginBottom: "1rem" }}>
+          <Filter size={20} style={{ color: "var(--color-primary)" }} />
+          <h3 style={{ margin: 0, fontSize: "1.1rem" }}>Filters</h3>
         </div>
-        <div className="filter-group">
-          <label>Status:</label>
-          <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}>
-            <option value="">All</option>
-            <option value="Open">Open</option>
-            <option value="Closed">Closed</option>
-          </select>
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
+            gap: "1rem",
+            alignItems: "end",
+          }}
+        >
+          <div className="form-group" style={{ margin: 0 }}>
+            <label>Added By</label>
+            <input
+              type="text"
+              value={addedByFilter}
+              onChange={(e) => setAddedByFilter(e.target.value)}
+              placeholder="Enter name"
+              style={{ margin: 0 }}
+            />
+          </div>
+          <div className="form-group" style={{ margin: 0 }}>
+            <label>Status</label>
+            <select
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              style={{ margin: 0 }}
+            >
+              <option value="">All Status</option>
+              <option value="Open">Open</option>
+              <option value="Closed">Closed</option>
+            </select>
+          </div>
+          <div style={{ display: "flex", gap: "0.5rem" }}>
+            <button
+              className="btn-primary"
+              onClick={handleFilterChange}
+              style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}
+            >
+              <Search size={16} />
+              Apply
+            </button>
+            <button
+              className="btn-secondary"
+              onClick={clearFilters}
+              style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}
+            >
+              <X size={16} />
+              Clear
+            </button>
+          </div>
         </div>
-        <button className="apply-filters-btn" onClick={handleFilterChange}>
-          Apply Filters
-        </button>
-        <button className="clear-filters-btn" onClick={clearFilters}>
-          Clear Filters
-        </button>
       </div>
 
       {/* Table Section */}
-      <div className="table-card">
-        <h3>Inquiries</h3>
-        <table className="data-table">
-          <thead>
-            <tr>
-              <th>Type</th>
-              <th>Method</th>
-              <th>Port of Loading</th>
-              <th>Port of Discharge</th>
-              <th>Created Date</th>
-              <th>Rate Offered</th>
-              <th>Client Name</th>
-              <th>Client Contact No</th>
-              <th>Client Contact Email</th>
-              <th>Feedback</th>
-              <th>Status</th>
-              <th>Added By</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredInquiries?.length > 0 ? (
-              filteredInquiries.map((inquiry) => (
-                <tr key={inquiry.id}>
-                  <td>{inquiry.type}</td>
-                  <td>{inquiry.method}</td>
-                  <td>{inquiry.portOfLoading}</td>
-                  <td>{inquiry.portOfDischarge}</td>
-                  <td>{inquiry.createdDate}</td>
-                  <td>{inquiry.offeredRate}</td>
-                  <td>{inquiry.clientName}</td>
-                  <td>{inquiry.clientContactNo}</td>
-                  <td>{inquiry.clientContactEmail}</td>
-                  <td>{inquiry.feedback}</td>
-                  <td>{inquiry.status}</td>
-                  <td>{inquiry.addedBy}</td>
-                </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan={11}>No inquiries found.</td>
+      <div className="card" style={{ padding: "1.5rem" }}>
+        <div style={{ overflowX: "auto" }}>
+          <table
+            style={{
+              width: "100%",
+              borderCollapse: "collapse",
+              fontSize: "0.9rem",
+            }}
+          >
+            <thead>
+              <tr
+                style={{
+                  background: "var(--color-bg-dark)",
+                  borderBottom: "2px solid var(--color-border)",
+                }}
+              >
+                <th style={{ padding: "0.75rem", textAlign: "left", fontWeight: "600" }}>Type</th>
+                <th style={{ padding: "0.75rem", textAlign: "left", fontWeight: "600" }}>Method</th>
+                <th style={{ padding: "0.75rem", textAlign: "left", fontWeight: "600" }}>
+                  Loading Port
+                </th>
+                <th style={{ padding: "0.75rem", textAlign: "left", fontWeight: "600" }}>
+                  Discharge Port
+                </th>
+                <th style={{ padding: "0.75rem", textAlign: "left", fontWeight: "600" }}>
+                  Created Date
+                </th>
+                <th style={{ padding: "0.75rem", textAlign: "left", fontWeight: "600" }}>Rate</th>
+                <th style={{ padding: "0.75rem", textAlign: "left", fontWeight: "600" }}>Client</th>
+                <th style={{ padding: "0.75rem", textAlign: "left", fontWeight: "600" }}>
+                  Contact
+                </th>
+                <th style={{ padding: "0.75rem", textAlign: "left", fontWeight: "600" }}>Status</th>
+                <th style={{ padding: "0.75rem", textAlign: "left", fontWeight: "600" }}>
+                  Added By
+                </th>
               </tr>
-            )}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {filteredInquiries?.length > 0 ? (
+                filteredInquiries.map((inquiry) => (
+                  <tr
+                    key={inquiry.id}
+                    style={{
+                      borderBottom: "1px solid var(--color-border)",
+                      transition: "background var(--transition)",
+                    }}
+                  >
+                    <td style={{ padding: "0.75rem" }}>
+                      <span
+                        style={{
+                          background:
+                            inquiry.type === "Export"
+                              ? "var(--color-success)"
+                              : "var(--color-secondary)",
+                          color: "#fff",
+                          padding: "0.25rem 0.5rem",
+                          borderRadius: "4px",
+                          fontSize: "0.8rem",
+                          fontWeight: "500",
+                        }}
+                      >
+                        {inquiry.type}
+                      </span>
+                    </td>
+                    <td style={{ padding: "0.75rem" }}>{inquiry.method}</td>
+                    <td style={{ padding: "0.75rem" }}>{inquiry.portOfLoading}</td>
+                    <td style={{ padding: "0.75rem" }}>{inquiry.portOfDischarge}</td>
+                    <td style={{ padding: "0.75rem" }}>
+                      {new Date(inquiry.createdDate).toLocaleDateString()}
+                    </td>
+                    <td style={{ padding: "0.75rem", fontWeight: "600" }}>
+                      ${inquiry.offeredRate}
+                    </td>
+                    <td style={{ padding: "0.75rem" }}>
+                      <div>
+                        <div style={{ fontWeight: "500" }}>{inquiry.clientName}</div>
+                        <div style={{ fontSize: "0.8rem", color: "var(--color-text-light)" }}>
+                          {inquiry.clientContactEmail}
+                        </div>
+                      </div>
+                    </td>
+                    <td style={{ padding: "0.75rem" }}>{inquiry.clientContactNo}</td>
+                    <td style={{ padding: "0.75rem" }}>
+                      <span
+                        style={{
+                          background:
+                            inquiry.status === "Open"
+                              ? "var(--color-success)"
+                              : "var(--color-error)",
+                          color: "#fff",
+                          padding: "0.25rem 0.5rem",
+                          borderRadius: "4px",
+                          fontSize: "0.8rem",
+                          fontWeight: "500",
+                        }}
+                      >
+                        {inquiry.status}
+                      </span>
+                    </td>
+                    <td style={{ padding: "0.75rem" }}>{inquiry.addedBy}</td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td
+                    colSpan={10}
+                    style={{
+                      padding: "2rem",
+                      textAlign: "center",
+                      color: "var(--color-text-light)",
+                      fontSize: "1.1rem",
+                    }}
+                  >
+                    No inquiries found.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );

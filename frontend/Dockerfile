@@ -35,5 +35,19 @@ EXPOSE 5173
 ENV HOST=0.0.0.0
 ENV PORT=5173
 
-# Start the application with inline script
-CMD sh -c 'echo "Starting frontend with backend URL: $VITE_BACKEND_URL" && if [ -n "$VITE_BACKEND_URL" ]; then echo "Injecting backend URL..." && find /app/dist -name "*.js" -exec sed -i "s|http://api:3000|$VITE_BACKEND_URL|g" {} \; && find /app/dist -name "*.js" -exec sed -i "s|http://localhost:3000|$VITE_BACKEND_URL|g" {} \; && echo "Backend URL injection complete"; fi && serve -s dist -l 5173'
+# Create a simple start script
+RUN echo '#!/bin/sh' > /app/start.sh && \
+    echo 'echo "Starting frontend with backend URL: $VITE_BACKEND_URL"' >> /app/start.sh && \
+    echo 'if [ -n "$VITE_BACKEND_URL" ]; then' >> /app/start.sh && \
+    echo '  echo "Injecting backend URL into built files..."' >> /app/start.sh && \
+    echo '  find /app/dist -name "*.js" -exec sed -i "s|http://api:3000|$VITE_BACKEND_URL|g" {} \;' >> /app/start.sh && \
+    echo '  find /app/dist -name "*.js" -exec sed -i "s|http://localhost:3000|$VITE_BACKEND_URL|g" {} \;' >> /app/start.sh && \
+    echo '  echo "Backend URL injection complete"' >> /app/start.sh && \
+    echo 'fi' >> /app/start.sh && \
+    echo 'serve -s dist -l 5173' >> /app/start.sh
+
+# Make the script executable
+RUN chmod +x /app/start.sh
+
+# Start the application
+CMD ["/bin/sh", "/app/start.sh"]

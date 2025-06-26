@@ -18,6 +18,11 @@ export class InquiriesController {
     return this.inquiriesService.getAllInquiries();
   }
 
+  @Get('stats')
+  async getStats() {
+    return this.inquiriesService.getStats();
+  }
+
   @Get(':id')
   findOne(@Param('id') id: number) {
     return this.inquiriesService.findOne(id);

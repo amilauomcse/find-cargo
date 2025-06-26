@@ -1,8 +1,9 @@
 // RatesDashboard.tsx (modernized)
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import "./Dashboard.css"; // We'll define modern styles in this CSS file
+import { Search, Filter, X, BarChart } from "lucide-react";
 import { getRates } from "../services/api";
+import PortSelect from "./PortSelect";
 
 interface Rate {
   id: number;
@@ -24,17 +25,15 @@ interface Rate {
 
 const RatesDashboard: React.FC = () => {
   const [rates, setRates] = useState<Rate[]>([]);
-  const [filteredRates, setFilteredRates] = useState<Rate[]>(rates);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [filteredRates, setFilteredRates] = useState<Rate[]>([]);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
   const [containerType, setContainerType] = useState("");
   const [term, setTerm] = useState("");
   const [loadingPort, setLoadingPort] = useState("");
   const [dischargePort, setDischargePort] = useState("");
   const [cargoReadyDate, setCargoReadyDate] = useState("");
 
-  //fetch rates from API
   useEffect(() => {
     const fetchRates = async () => {
       try {
@@ -48,22 +47,10 @@ const RatesDashboard: React.FC = () => {
         setLoading(false);
       }
     };
-
     fetchRates();
   }, []);
 
-  if (loading) return <div>Loading...</div>;
-  if (error) return <div>Error: {error}</div>;
-
   const handleFilterChange = () => {
-    console.log("Filters applied:", {
-      containerType,
-      term,
-      loadingPort,
-      dischargePort,
-      cargoReadyDate,
-    });
-
     const newFilteredRates = rates.filter(
       (rate) =>
         (containerType ? rate.containerType === containerType : true) &&
@@ -84,117 +71,251 @@ const RatesDashboard: React.FC = () => {
     setFilteredRates(rates);
   };
 
+  if (loading) {
+    return (
+      <div className="loading-container">
+        <div className="loading-spinner"></div>
+        <p>Loading rates...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return <div className="error-state">Error: {error}</div>;
+  }
+
   return (
-    <div className="dashboard-page">
+    <div style={{ maxWidth: "1400px", margin: "0 auto", padding: "1rem" }}>
       {/* Page Header */}
-      <div className="page-header">
-        <h2>Rates Dashboard</h2>
-        <Link to="/rates/add">
-          <button className="primary-btn">Add Rates</button>
+      <div
+        className="card"
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          marginBottom: "1rem",
+          padding: "1.5rem",
+        }}
+      >
+        <div>
+          <h1 style={{ margin: "0 0 0.5rem 0", color: "var(--color-secondary)" }}>
+            Rates Dashboard
+          </h1>
+          <p style={{ margin: 0, color: "var(--color-text-light)" }}>
+            Manage shipping rates and pricing ({filteredRates.length} total)
+          </p>
+        </div>
+        <Link
+          to="/rates/add"
+          className="btn-primary"
+          style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}
+        >
+          <BarChart size={20} />
+          Add Rates
         </Link>
       </div>
 
-      {/* Filters */}
-      <div className="search-filter-bar">
-        <div className="filter-group">
-          <label>Container Type:</label>
-          <select value={containerType} onChange={(e) => setContainerType(e.target.value)}>
-            <option value="">Select Container Type</option>
-            <option value="20ft">20ft</option>
-            <option value="40ft">40ft</option>
-          </select>
+      {/* Filters Section */}
+      <div className="card" style={{ marginBottom: "1rem", padding: "1.5rem" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "1rem", marginBottom: "1rem" }}>
+          <Filter size={20} style={{ color: "var(--color-secondary)" }} />
+          <h3 style={{ margin: 0, fontSize: "1.1rem" }}>Filters</h3>
         </div>
-        <div className="filter-group">
-          <label>Term:</label>
-          <select value={term} onChange={(e) => setTerm(e.target.value)}>
-            <option value="">Select Term</option>
-            <option value="short">Short Term</option>
-            <option value="long">Long Term</option>
-          </select>
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
+            gap: "1rem",
+            alignItems: "end",
+          }}
+        >
+          <div className="form-group" style={{ margin: 0 }}>
+            <label>Container Type</label>
+            <select
+              value={containerType}
+              onChange={(e) => setContainerType(e.target.value)}
+              style={{ margin: 0 }}
+            >
+              <option value="">All Types</option>
+              <option value="20ft">20ft</option>
+              <option value="40ft">40ft</option>
+            </select>
+          </div>
+          <div className="form-group" style={{ margin: 0 }}>
+            <label>Term</label>
+            <select value={term} onChange={(e) => setTerm(e.target.value)} style={{ margin: 0 }}>
+              <option value="">All Terms</option>
+              <option value="short">Short Term</option>
+              <option value="long">Long Term</option>
+            </select>
+          </div>
+          <div className="form-group" style={{ margin: 0 }}>
+            <label>Loading Port</label>
+            <PortSelect value={loadingPort} onChange={setLoadingPort} placeholder="All Ports" />
+          </div>
+          <div className="form-group" style={{ margin: 0 }}>
+            <label>Discharge Port</label>
+            <PortSelect value={dischargePort} onChange={setDischargePort} placeholder="All Ports" />
+          </div>
+          <div className="form-group" style={{ margin: 0 }}>
+            <label>Cargo Ready Date</label>
+            <input
+              type="date"
+              value={cargoReadyDate}
+              onChange={(e) => setCargoReadyDate(e.target.value)}
+              style={{ margin: 0 }}
+            />
+          </div>
+          <div style={{ display: "flex", gap: "0.5rem" }}>
+            <button
+              className="btn-primary"
+              onClick={handleFilterChange}
+              style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}
+            >
+              <Search size={16} />
+              Apply
+            </button>
+            <button
+              className="btn-secondary"
+              onClick={clearFilters}
+              style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}
+            >
+              <X size={16} />
+              Clear
+            </button>
+          </div>
         </div>
-        <div className="filter-group">
-          <label>Loading Port:</label>
-          <select value={loadingPort} onChange={(e) => setLoadingPort(e.target.value)}>
-            <option value="">Select Loading Port</option>
-            <option value="Port A">Port A</option>
-            <option value="Port B">Port B</option>
-          </select>
-        </div>
-        <div className="filter-group">
-          <label>Discharge Port:</label>
-          <select value={dischargePort} onChange={(e) => setDischargePort(e.target.value)}>
-            <option value="">Select Discharge Port</option>
-            <option value="Port C">Port C</option>
-            <option value="Port D">Port D</option>
-          </select>
-        </div>
-        <div className="filter-group">
-          <label>Cargo Ready Date:</label>
-          <input
-            type="date"
-            value={cargoReadyDate}
-            onChange={(e) => setCargoReadyDate(e.target.value)}
-          />
-        </div>
-        <button className="apply-filters-btn" onClick={handleFilterChange}>
-          Apply Filters
-        </button>
-        <button className="clear-filters-btn" onClick={clearFilters}>
-          Clear Filters
-        </button>
       </div>
 
       {/* Table Section */}
-      <div className="table-card">
-        <h3>Rates</h3>
-        <table className="data-table">
-          <thead>
-            <tr>
-              <th>Agent Name</th>
-              <th>ETD</th>
-              <th>Carrier</th>
-              <th>Container Type</th>
-              <th>Sea Freight</th>
-              <th>Other Cost</th>
-              <th>Ex Cost</th>
-              <th>Total</th>
-              <th>Transit Time</th>
-              <th>Rate Type</th>
-              <th>Created Date</th>
-              <th>Type</th>
-              <th>Loading Port</th>
-              <th>Discharge Port</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredRates?.length > 0 ? (
-              filteredRates?.map((rate) => (
-                <tr key={rate.id}>
-                  <td>{rate.agentName}</td>
-                  <td>{rate.etd}</td>
-                  <td>{rate.carrier}</td>
-                  <td>{rate.containerType}</td>
-                  <td>{rate.seaFreight}</td>
-                  <td>{rate.otherCost}</td>
-                  <td>{rate.exCost}</td>
-                  <td>{rate.total}</td>
-                  <td>{rate.transitTime}</td>
-                  <td>{rate.rateType}</td>
-                  <td>{rate.createdDate}</td>
-                  <td>{rate.type}</td>
-                  <td>{rate.loadingPort}</td>
-                  <td>{rate.dischargePort}</td>
-                </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan={11} style={{ textAlign: "center" }}>
-                  No rates found.
-                </td>
+      <div className="card" style={{ padding: "1.5rem" }}>
+        <div style={{ overflowX: "auto" }}>
+          <table
+            style={{
+              width: "100%",
+              borderCollapse: "collapse",
+              fontSize: "0.9rem",
+            }}
+          >
+            <thead>
+              <tr
+                style={{
+                  background: "var(--color-bg-dark)",
+                  borderBottom: "2px solid var(--color-border)",
+                }}
+              >
+                <th style={{ padding: "0.75rem", textAlign: "left", fontWeight: "600" }}>Agent</th>
+                <th style={{ padding: "0.75rem", textAlign: "left", fontWeight: "600" }}>ETD</th>
+                <th style={{ padding: "0.75rem", textAlign: "left", fontWeight: "600" }}>
+                  Carrier
+                </th>
+                <th style={{ padding: "0.75rem", textAlign: "left", fontWeight: "600" }}>
+                  Container
+                </th>
+                <th style={{ padding: "0.75rem", textAlign: "left", fontWeight: "600" }}>
+                  Sea Freight
+                </th>
+                <th style={{ padding: "0.75rem", textAlign: "left", fontWeight: "600" }}>
+                  Other Cost
+                </th>
+                <th style={{ padding: "0.75rem", textAlign: "left", fontWeight: "600" }}>
+                  Ex Cost
+                </th>
+                <th style={{ padding: "0.75rem", textAlign: "left", fontWeight: "600" }}>Total</th>
+                <th style={{ padding: "0.75rem", textAlign: "left", fontWeight: "600" }}>
+                  Transit
+                </th>
+                <th style={{ padding: "0.75rem", textAlign: "left", fontWeight: "600" }}>Type</th>
+                <th style={{ padding: "0.75rem", textAlign: "left", fontWeight: "600" }}>Route</th>
               </tr>
-            )}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {filteredRates?.length > 0 ? (
+                filteredRates.map((rate) => (
+                  <tr
+                    key={rate.id}
+                    style={{
+                      borderBottom: "1px solid var(--color-border)",
+                      transition: "background var(--transition)",
+                    }}
+                  >
+                    <td style={{ padding: "0.75rem", fontWeight: "500" }}>{rate.agentName}</td>
+                    <td style={{ padding: "0.75rem" }}>
+                      {new Date(rate.etd).toLocaleDateString()}
+                    </td>
+                    <td style={{ padding: "0.75rem" }}>{rate.carrier}</td>
+                    <td style={{ padding: "0.75rem" }}>
+                      <span
+                        style={{
+                          background: "var(--color-secondary)",
+                          color: "#fff",
+                          padding: "0.25rem 0.5rem",
+                          borderRadius: "4px",
+                          fontSize: "0.8rem",
+                          fontWeight: "500",
+                        }}
+                      >
+                        {rate.containerType}
+                      </span>
+                    </td>
+                    <td style={{ padding: "0.75rem", fontWeight: "600" }}>${rate.seaFreight}</td>
+                    <td style={{ padding: "0.75rem" }}>${rate.otherCost}</td>
+                    <td style={{ padding: "0.75rem" }}>${rate.exCost}</td>
+                    <td
+                      style={{
+                        padding: "0.75rem",
+                        fontWeight: "700",
+                        color: "var(--color-primary)",
+                      }}
+                    >
+                      ${rate.total}
+                    </td>
+                    <td style={{ padding: "0.75rem" }}>{rate.transitTime}</td>
+                    <td style={{ padding: "0.75rem" }}>
+                      <span
+                        style={{
+                          background:
+                            rate.type === "short" ? "var(--color-success)" : "var(--color-accent)",
+                          color: "#fff",
+                          padding: "0.25rem 0.5rem",
+                          borderRadius: "4px",
+                          fontSize: "0.8rem",
+                          fontWeight: "500",
+                        }}
+                      >
+                        {rate.type}
+                      </span>
+                    </td>
+                    <td style={{ padding: "0.75rem" }}>
+                      <div>
+                        <div style={{ fontWeight: "500", fontSize: "0.85rem" }}>
+                          {rate.loadingPort}
+                        </div>
+                        <div style={{ fontSize: "0.8rem", color: "var(--color-text-light)" }}>
+                          → {rate.dischargePort}
+                        </div>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td
+                    colSpan={11}
+                    style={{
+                      padding: "2rem",
+                      textAlign: "center",
+                      color: "var(--color-text-light)",
+                      fontSize: "1.1rem",
+                    }}
+                  >
+                    No rates found.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );
