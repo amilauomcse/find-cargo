@@ -110,3 +110,70 @@ To stop Docker databases:
 ```bash
 docker-compose down
 ```
+
+## Database Migrations
+
+The application uses TypeORM's built-in migration system. Migrations should be run manually before starting the application to ensure the database schema is up to date.
+
+### Migration Workflow
+
+**Before starting the application for the first time or after making entity changes:**
+
+1. **Run migrations manually:**
+   ```bash
+   yarn migration:run
+   ```
+
+2. **Then start the application:**
+   ```bash
+   yarn start:dev
+   ```
+
+### Migration Commands
+
+```bash
+# Generate a new migration (after making entity changes)
+yarn migration:generate -- migrations/YourMigrationName
+
+# Run migrations manually
+yarn migration:run
+
+# Revert the last migration
+yarn migration:revert
+```
+
+### Creating New Migrations
+
+1. Make changes to your entities
+2. Run `yarn migration:generate -- migrations/DescriptiveMigrationName`
+3. Review the generated migration file in the `migrations/` directory
+4. Run `yarn migration:run` to apply the migration
+5. Start the application
+
+### Migration Files
+
+Migrations are stored in the `migrations/` directory and follow the naming convention:
+`{timestamp}-{description}.ts`
+
+Example: `1700000000002-CreateAuditLogsTable.ts`
+
+### Why Manual Migrations?
+
+TypeORM's migration system is designed to be run from the command line, not from within the application. This approach:
+
+- **Avoids module loading issues** - No ES6 import problems during application startup
+- **Provides better control** - You decide when migrations run
+- **Follows best practices** - Separates database schema changes from application logic
+- **Enables proper CI/CD** - Can run migrations as part of deployment process
+
+### Troubleshooting
+
+If you encounter module loading issues with migrations:
+- Make sure you're using the correct TypeScript syntax in migration files
+- The migration runner uses `ts-node` for TypeScript support
+- Migration files should use ES6 import/export syntax
+- Run migrations manually using `yarn migration:run`
+
+## Development
+
+// ... existing code ...

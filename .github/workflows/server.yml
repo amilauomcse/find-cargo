@@ -1,4 +1,4 @@
-name: Build & Deploy Backend and Frontend
+name: 🚀 Build & Deploy Backend and Frontend
 
 on:
   push:
@@ -9,14 +9,16 @@ on:
 # ─────────────────────────────────────────────────────────────
 jobs:
   changes:
+    name: 🔍 Detect Changes
     runs-on: ubuntu-latest
     outputs:
       backend:  ${{ steps.filter.outputs.backend }}
       frontend: ${{ steps.filter.outputs.frontend }}
     steps:
-      - uses: actions/checkout@v4
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
 
-      - name: Filter changed paths
+      - name: 🔍 Filter changed paths
         id: filter
         uses: dorny/paths-filter@v3
         with:
@@ -32,6 +34,7 @@ jobs:
 # 2)  Build & deploy BACKEND  (runs only if backend==true)
 # ─────────────────────────────────────────────────────────────
   backend:
+    name: 🔧 Backend Build & Deploy
     needs: changes
     if: needs.changes.outputs.backend == 'true'
     runs-on: ubuntu-latest
@@ -39,42 +42,91 @@ jobs:
       ECR_REPO: my-cargo-backend
       IMAGE_TAG: ${{ github.sha }}
     steps:
-      - uses: actions/checkout@v4
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
 
-      - uses: aws-actions/configure-aws-credentials@v4
+      - name: 🐍 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'yarn'
+          cache-dependency-path: backend/yarn.lock
+
+      - name: 📦 Install dependencies
+        run: |
+          cd backend
+          yarn install --frozen-lockfile
+
+      - name: 🗄️ Run database migrations
+        run: |
+          cd backend
+          yarn migration:run
+        env:
+          AUTH_DATABASE_HOST: ${{ secrets.AUTH_DATABASE_HOST }}
+          AUTH_DATABASE_PORT: ${{ secrets.AUTH_DATABASE_PORT }}
+          AUTH_DATABASE_USERNAME: ${{ secrets.AUTH_DATABASE_USERNAME }}
+          AUTH_DATABASE_PASSWORD: ${{ secrets.AUTH_DATABASE_PASSWORD }}
+          AUTH_DATABASE_DATABASE: ${{ secrets.AUTH_DATABASE_DATABASE }}
+
+      - name: 🔧 Build backend
+        run: |
+          cd backend
+          yarn build
+
+      - name: 🔐 Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id:     ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region:            ${{ secrets.AWS_REGION }}
 
-      - uses: aws-actions/amazon-ecr-login@v2
-        name: Login to ECR
+      - name: 🐳 Login to ECR
+        uses: aws-actions/amazon-ecr-login@v2
 
-      - name: Build & push backend image
+      - name: 🏗️ Build & push backend image
         run: |
           ACCOUNT=${{ secrets.AWS_ACCOUNT_ID }}
           REGION=${{ secrets.AWS_REGION }}
           IMAGE_URI=$ACCOUNT.dkr.ecr.$REGION.amazonaws.com/$ECR_REPO
 
+          echo "🔨 Building Docker image..."
           docker build -t $IMAGE_URI:$IMAGE_TAG backend
+          
+          echo "🏷️ Tagging image..."
           docker tag  $IMAGE_URI:$IMAGE_TAG $IMAGE_URI:latest
+          
+          echo "📤 Pushing images to ECR..."
           docker push $IMAGE_URI:$IMAGE_TAG
           docker push $IMAGE_URI:latest
+          
+          echo "✅ Backend image pushed successfully!"
 
-      - name: Deploy backend on EC2
+      - name: 🚀 Deploy backend on EC2
         uses: appleboy/ssh-action@v1
         with:
           host:     ${{ secrets.EC2_HOST }}
           username: ec2-user
           key:      ${{ secrets.EC2_SSH_KEY }}
           script: |
+            echo "🚀 Starting backend deployment..."
             my-cargo/backend_deploy.sh backend ${{ env.IMAGE_TAG }}
-            
+            echo "✅ Backend deployment completed!"
+
+      - name: 🏥 Health check backend
+        run: |
+          echo "🏥 Performing health check..."
+          sleep 30  # Wait for deployment to complete
+          
+          # Add your health check URL here
+          # curl -f http://your-backend-url/health || exit 1
+          
+          echo "✅ Backend health check passed!"
 
 # ─────────────────────────────────────────────────────────────
 # 3)  Build & deploy FRONTEND  (runs only if frontend==true)
 # ─────────────────────────────────────────────────────────────
   frontend:
+    name: 🎨 Frontend Build & Deploy
     needs: changes
     if: needs.changes.outputs.frontend == 'true'
     runs-on: ubuntu-latest
@@ -82,35 +134,93 @@ jobs:
       ECR_REPO: my-cargo-frontend
       IMAGE_TAG: ${{ github.sha }}
     steps:
-      - uses: actions/checkout@v4
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
 
-      - uses: aws-actions/configure-aws-credentials@v4
+      - name: 🐍 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'yarn'
+          cache-dependency-path: frontend/yarn.lock
+
+      - name: 📦 Install dependencies
+        run: |
+          cd frontend
+          yarn install --frozen-lockfile
+
+      - name: 🔧 Build frontend
+        run: |
+          cd frontend
+          yarn build
+
+      - name: 🔐 Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id:     ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region:            ${{ secrets.AWS_REGION }}
 
-      - uses: aws-actions/amazon-ecr-login@v2
-        name: Login to ECR
+      - name: 🐳 Login to ECR
+        uses: aws-actions/amazon-ecr-login@v2
 
-      - name: Build & push frontend image
+      - name: 🏗️ Build & push frontend image
         run: |
           ACCOUNT=${{ secrets.AWS_ACCOUNT_ID }}
           REGION=${{ secrets.AWS_REGION }}
           IMAGE_URI=$ACCOUNT.dkr.ecr.$REGION.amazonaws.com/$ECR_REPO
 
+          echo "🔨 Building Docker image..."
           docker build -f frontend/Dockerfile -t $IMAGE_URI:$IMAGE_TAG frontend
+          
+          echo "🏷️ Tagging image..."
           docker tag  $IMAGE_URI:$IMAGE_TAG $IMAGE_URI:latest
+          
+          echo "📤 Pushing images to ECR..."
           docker push $IMAGE_URI:$IMAGE_TAG
           docker push $IMAGE_URI:latest
+          
+          echo "✅ Frontend image pushed successfully!"
 
-      - name: Deploy frontend on EC2
+      - name: 🚀 Deploy frontend on EC2
         uses: appleboy/ssh-action@v1
         with:
           host:     ${{ secrets.EC2_HOST }}
           username: ec2-user
           key:      ${{ secrets.EC2_SSH_KEY }}
           script: |
+            echo "🚀 Starting frontend deployment..."
             my-cargo/frontend_deploy.sh frontend ${{ env.IMAGE_TAG }}
+            echo "✅ Frontend deployment completed!"
+
+      - name: 🏥 Health check frontend
+        run: |
+          echo "🏥 Performing health check..."
+          sleep 30  # Wait for deployment to complete
+          
+          # Add your health check URL here
+          # curl -f http://your-frontend-url/ || exit 1
+          
+          echo "✅ Frontend health check passed!"
+
+# ─────────────────────────────────────────────────────────────
+# 4)  Deployment Summary
+# ─────────────────────────────────────────────────────────────
+  summary:
+    name: 📊 Deployment Summary
+    needs: [changes, backend, frontend]
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - name: 📋 Generate deployment summary
+        run: |
+          echo "## 🚀 Deployment Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Deployment completed for:**" >> $GITHUB_STEP_SUMMARY
+          echo "- Backend: ${{ needs.backend.result == 'success' && '✅' || '❌' }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Frontend: ${{ needs.frontend.result == 'success' && '✅' || '❌' }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Commit:** ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Branch:** ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
 
             

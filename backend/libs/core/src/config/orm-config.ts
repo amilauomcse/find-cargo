@@ -1,5 +1,10 @@
 import { TypeOrmModuleOptions } from "@nestjs/typeorm";
 import { ConfigService } from "@nestjs/config";
+import { DataSource } from "typeorm";
+import { config } from "dotenv";
+
+// Load environment variables
+config();
 
 // System database configuration
 export const systemOrmConfig = (configService: ConfigService): TypeOrmModuleOptions => ({
@@ -46,3 +51,17 @@ const ormConfig = (configService: ConfigService): TypeOrmModuleOptions =>
   systemOrmConfig(configService);
 
 export default ormConfig;
+
+// DataSource configuration for TypeORM CLI
+export const dataSource = new DataSource({
+  type: "postgres",
+  host: process.env.AUTH_DATABASE_HOST || "localhost",
+  port: parseInt(process.env.AUTH_DATABASE_PORT || "5432"),
+  username: process.env.AUTH_DATABASE_USERNAME || "postgres",
+  password: process.env.AUTH_DATABASE_PASSWORD || "password",
+  database: process.env.AUTH_DATABASE_DATABASE || "auth_db",
+  entities: [__dirname + "/../../shared/src/**/*.entity.ts"],
+  migrations: [__dirname + "/../../../migrations/*.ts"], // Use TypeScript files
+  synchronize: false,
+  logging: process.env.NODE_ENV === "development",
+});

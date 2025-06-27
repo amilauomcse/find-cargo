@@ -3,6 +3,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { DataSource } from 'typeorm';
+import { InjectDataSource } from '@nestjs/typeorm';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
@@ -34,16 +36,28 @@ import { AuditModule } from '../../api/src/audit/audit.module';
   exports: [AuthService, JwtAuthGuard, RolesGuard],
 })
 export class AuthModule implements OnModuleInit {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    @InjectDataSource('auth') private readonly authDataSource: DataSource,
+  ) {}
 
   async onModuleInit() {
     const logger = new Logger(AuthModule.name);
+
     try {
+      // Note: Migrations should be run manually before starting the application
+      // Use: yarn migration:run
+      logger.log('Auth module initialized successfully');
+
       // Create root user on startup
       const rootUser = await this.authService.createRootUser();
       logger.log('Root user initialized: ' + rootUser.email);
     } catch (error) {
-      logger.error('Failed to create root user:', error.message);
+      logger.error('Failed to initialize auth module:', error.message);
+      // Don't throw error to prevent app from crashing
+      logger.warn(
+        'Continuing with application startup despite initialization issues',
+      );
     }
   }
 }
