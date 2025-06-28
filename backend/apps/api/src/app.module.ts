@@ -8,7 +8,8 @@ import {
 } from '../../../libs/core/src/config/orm-config';
 import { CoreModule } from '../../../libs/core/src/core.module';
 import { SharedModule } from '../../../libs/shared/src/shared.module';
-import { AuthModule } from '../../auth/src/auth.module';
+import { AuthModule as AuthAppModule } from '../../auth/src/auth.module';
+import { AuthModule } from './auth/auth.module';
 import { OrganizationsModule } from './organizations/organizations.module';
 import { UsersModule } from './users/users.module';
 import { AuditModule } from './audit/audit.module';
@@ -41,6 +42,7 @@ import { SalesCallsModule } from './salesCalls/salesCalls.module';
     }),
     CoreModule,
     SharedModule,
+    AuthAppModule,
     AuthModule,
     OrganizationsModule,
     UsersModule,

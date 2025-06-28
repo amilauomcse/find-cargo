@@ -12,6 +12,8 @@ import {
   UserRole,
   UserStatus,
 } from '../../../../libs/shared/src/auth/entities/user.entity';
+import { AuditService } from '../audit/audit.service';
+import { AuditAction } from '../../../../libs/shared/src/audit/entities/audit-log.entity';
 
 @Injectable()
 export class OrganizationsService {
@@ -20,6 +22,7 @@ export class OrganizationsService {
     private organizationRepository: Repository<Organization>,
     @InjectRepository(User, 'auth')
     private userRepository: Repository<User>,
+    private auditService: AuditService,
   ) {}
 
   async findAll() {
@@ -50,7 +53,7 @@ export class OrganizationsService {
     });
   }
 
-  async create(createOrganizationDto: any) {
+  async create(createOrganizationDto: any, userId?: number, request?: any) {
     const { adminUser, ...organizationData } = createOrganizationDto;
 
     // Create organization
@@ -73,6 +76,24 @@ export class OrganizationsService {
     });
     const savedUser = await this.userRepository.save(user);
 
+    // Log the audit event if user is provided
+    if (userId) {
+      await this.auditService.logOrganizationAction(
+        AuditAction.ORGANIZATION_CREATED,
+        `Organization created: ${savedOrganization.name}`,
+        userId,
+        savedOrganization.id,
+        savedOrganization.id,
+        {
+          organizationId: savedOrganization.id,
+          organizationName: savedOrganization.name,
+          adminUserId: savedUser.id,
+          adminEmail: savedUser.email,
+        },
+        request,
+      );
+    }
+
     return {
       ...savedOrganization,
       adminUser: {
@@ -84,7 +105,12 @@ export class OrganizationsService {
     };
   }
 
-  async update(id: number, updateOrganizationDto: any) {
+  async update(
+    id: number,
+    updateOrganizationDto: any,
+    userId?: number,
+    request?: any,
+  ) {
     const organization = await this.organizationRepository.findOne({
       where: { id },
     });
@@ -93,10 +119,35 @@ export class OrganizationsService {
     }
 
     Object.assign(organization, updateOrganizationDto);
-    return this.organizationRepository.save(organization);
+    const updatedOrganization =
+      await this.organizationRepository.save(organization);
+
+    // Log the audit event if user is provided
+    if (userId) {
+      await this.auditService.logOrganizationAction(
+        AuditAction.ORGANIZATION_UPDATED,
+        `Organization updated: ${updatedOrganization.name}`,
+        userId,
+        updatedOrganization.id,
+        updatedOrganization.id,
+        {
+          organizationId: updatedOrganization.id,
+          organizationName: updatedOrganization.name,
+          changes: updateOrganizationDto,
+        },
+        request,
+      );
+    }
+
+    return updatedOrganization;
   }
 
-  async updateStatus(id: number, status: string) {
+  async updateStatus(
+    id: number,
+    status: string,
+    userId?: number,
+    request?: any,
+  ) {
     const organization = await this.organizationRepository.findOne({
       where: { id },
     });
@@ -104,19 +155,58 @@ export class OrganizationsService {
       throw new Error('Organization not found');
     }
 
+    const oldStatus = organization.status;
     // Convert string to enum value
     const statusEnum = status as OrganizationStatus;
     organization.status = statusEnum;
-    return this.organizationRepository.save(organization);
+    const updatedOrganization =
+      await this.organizationRepository.save(organization);
+
+    // Log the audit event if user is provided
+    if (userId) {
+      await this.auditService.logOrganizationAction(
+        AuditAction.ORGANIZATION_STATUS_CHANGED,
+        `Organization status changed: ${updatedOrganization.name} to ${status}`,
+        userId,
+        updatedOrganization.id,
+        updatedOrganization.id,
+        {
+          organizationId: updatedOrganization.id,
+          organizationName: updatedOrganization.name,
+          oldStatus: oldStatus,
+          newStatus: status,
+        },
+        request,
+      );
+    }
+
+    return updatedOrganization;
   }
 
-  async delete(id: number) {
+  async delete(id: number, userId?: number, request?: any) {
     const organization = await this.organizationRepository.findOne({
       where: { id },
       relations: ['users'],
     });
     if (!organization) {
       throw new Error('Organization not found');
+    }
+
+    // Log the audit event if user is provided
+    if (userId) {
+      await this.auditService.logOrganizationAction(
+        AuditAction.ORGANIZATION_DELETED,
+        `Organization deleted: ${organization.name}`,
+        userId,
+        organization.id,
+        organization.id,
+        {
+          organizationId: organization.id,
+          organizationName: organization.name,
+          userCount: organization.users.length,
+        },
+        request,
+      );
     }
 
     // Delete all users in the organization
@@ -141,7 +231,12 @@ export class OrganizationsService {
     });
   }
 
-  async addUser(organizationId: number, createUserDto: any) {
+  async addUser(
+    organizationId: number,
+    createUserDto: any,
+    userId?: number,
+    request?: any,
+  ) {
     const organization = await this.organizationRepository.findOne({
       where: { id: organizationId },
     });
@@ -157,7 +252,28 @@ export class OrganizationsService {
       status: UserStatus.ACTIVE,
     });
 
-    return this.userRepository.save(user);
+    const savedUser = await this.userRepository.save(user);
+
+    // Log the audit event if user is provided
+    if (userId) {
+      await this.auditService.logUserAction(
+        AuditAction.USER_CREATED,
+        `User created: ${savedUser.email} in organization ${organization.name}`,
+        userId,
+        organizationId,
+        savedUser.id,
+        {
+          newUserId: savedUser.id,
+          newUserEmail: savedUser.email,
+          newUserRole: savedUser.role,
+          organizationId: organizationId,
+          organizationName: organization.name,
+        },
+        request,
+      );
+    }
+
+    return savedUser;
   }
 
   async publicRegister(createOrganizationDto: any) {

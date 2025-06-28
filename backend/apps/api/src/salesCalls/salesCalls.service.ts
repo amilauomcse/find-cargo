@@ -49,6 +49,71 @@ export class SalesCallsService {
     return this.salesCallsRepository.findOneBy({ id });
   }
 
+  async updateSalesCall(
+    id: number,
+    updateData: Partial<SalesCallsEntity>,
+    userId?: number,
+    organizationId?: number,
+    request?: any,
+  ): Promise<SalesCallsEntity> {
+    const salesCall = await this.findOne(id);
+    if (!salesCall) {
+      throw new Error('Sales call not found');
+    }
+
+    const updatedSalesCall = await this.salesCallsRepository.save({
+      ...salesCall,
+      ...updateData,
+      updatedAt: new Date(),
+    });
+
+    // Log the audit event if user and organization are provided
+    if (userId && organizationId) {
+      await this.auditService.logSalesCallAction(
+        AuditAction.SALES_CALL_UPDATED,
+        `Sales call updated: ${updatedSalesCall.companyName || updatedSalesCall.id}`,
+        userId,
+        organizationId,
+        updatedSalesCall.id,
+        {
+          salesCallId: updatedSalesCall.id,
+          companyName: updatedSalesCall.companyName,
+          changes: updateData,
+        },
+        request,
+      );
+    }
+
+    return updatedSalesCall;
+  }
+
+  async deleteSalesCall(
+    id: number,
+    userId?: number,
+    organizationId?: number,
+    request?: any,
+  ): Promise<void> {
+    const salesCall = await this.findOne(id);
+    if (!salesCall) {
+      throw new Error('Sales call not found');
+    }
+
+    await this.salesCallsRepository.remove(salesCall);
+
+    // Log the audit event if user and organization are provided
+    if (userId && organizationId) {
+      await this.auditService.logSalesCallAction(
+        AuditAction.SALES_CALL_DELETED,
+        `Sales call deleted: ${salesCall.companyName || salesCall.id}`,
+        userId,
+        organizationId,
+        salesCall.id,
+        { salesCallId: salesCall.id, companyName: salesCall.companyName },
+        request,
+      );
+    }
+  }
+
   async getStats() {
     const total = await this.salesCallsRepository.count();
 

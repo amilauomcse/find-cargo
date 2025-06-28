@@ -14,6 +14,7 @@ import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { OrganizationsService } from './organizations.service';
 import { UserRole } from '../../../../libs/shared/src/auth/entities/user.entity';
+import { CurrentUser, UserFromJwt } from '../auth/decorators/user.decorator';
 
 @Controller('organizations')
 @UseGuards(JwtAuthGuard, RolesGuard)
@@ -34,8 +35,16 @@ export class OrganizationsController {
 
   @Post()
   @Roles(UserRole.ROOT)
-  async createOrganization(@Body() createOrganizationDto: any) {
-    return this.organizationsService.create(createOrganizationDto);
+  async createOrganization(
+    @Body() createOrganizationDto: any,
+    @CurrentUser() user: UserFromJwt,
+    @Request() request: any,
+  ) {
+    return this.organizationsService.create(
+      createOrganizationDto,
+      user.sub,
+      request,
+    );
   }
 
   @Patch(':id')
@@ -43,10 +52,14 @@ export class OrganizationsController {
   async updateOrganization(
     @Param('id') id: string,
     @Body() updateOrganizationDto: any,
+    @CurrentUser() user: UserFromJwt,
+    @Request() request: any,
   ) {
     return this.organizationsService.update(
       parseInt(id),
       updateOrganizationDto,
+      user.sub,
+      request,
     );
   }
 
@@ -55,17 +68,25 @@ export class OrganizationsController {
   async updateOrganizationStatus(
     @Param('id') id: string,
     @Body() statusDto: { status: string },
+    @CurrentUser() user: UserFromJwt,
+    @Request() request: any,
   ) {
     return this.organizationsService.updateStatus(
       parseInt(id),
       statusDto.status,
+      user.sub,
+      request,
     );
   }
 
   @Delete(':id')
   @Roles(UserRole.ROOT)
-  async deleteOrganization(@Param('id') id: string) {
-    return this.organizationsService.delete(parseInt(id));
+  async deleteOrganization(
+    @Param('id') id: string,
+    @CurrentUser() user: UserFromJwt,
+    @Request() request: any,
+  ) {
+    return this.organizationsService.delete(parseInt(id), user.sub, request);
   }
 
   @Get(':id/users')
@@ -86,16 +107,19 @@ export class OrganizationsController {
   async addUserToOrganization(
     @Param('id') id: string,
     @Body() createUserDto: any,
-    @Request() req: any,
+    @CurrentUser() user: UserFromJwt,
+    @Request() request: any,
   ) {
     // Check if user is admin of this organization
-    if (
-      req.user.role === UserRole.ADMIN &&
-      req.user.organizationId !== parseInt(id)
-    ) {
+    if (user.role === UserRole.ADMIN && user.organizationId !== parseInt(id)) {
       throw new Error('Access denied');
     }
-    return this.organizationsService.addUser(parseInt(id), createUserDto);
+    return this.organizationsService.addUser(
+      parseInt(id),
+      createUserDto,
+      user.sub,
+      request,
+    );
   }
 
   @Post('register')
