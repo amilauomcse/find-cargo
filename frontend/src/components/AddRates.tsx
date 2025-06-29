@@ -37,6 +37,7 @@ const AddRates: React.FC = () => {
     e.preventDefault();
     setIsLoading(true);
     try {
+      console.log("Submitting rate data:", newRate);
       await addNewRate(newRate);
       alert("New Rate Submitted Successfully");
       setNewRate({
@@ -56,8 +57,11 @@ const AddRates: React.FC = () => {
         dischargePort: "",
       });
       navigate("/rates");
-    } catch (error) {
-      alert("Failed to submit the new rates data");
+    } catch (error: any) {
+      console.error("Error submitting rate:", error);
+      const errorMessage =
+        error.response?.data?.message || error.message || "Failed to submit the new rates data";
+      alert(`Error: ${errorMessage}`);
     } finally {
       setIsLoading(false);
     }

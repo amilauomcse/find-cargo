@@ -25,7 +25,15 @@ export class RateService {
       this.logger.log(
         `Creating new rate with data: ${JSON.stringify(rateData)}`,
       );
-      const newRate = this.rateRepository.create(rateData);
+
+      // Set the organization and user IDs
+      const rateWithIds = {
+        ...rateData,
+        organizationId: organizationId || null,
+        createdById: userId || null,
+      };
+
+      const newRate = this.rateRepository.create(rateWithIds);
       const rate = await this.rateRepository.save(newRate);
       this.logger.log(`Successfully created rate with ID: ${rate.id}`);
 
